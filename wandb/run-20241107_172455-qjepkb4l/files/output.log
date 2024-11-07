@@ -1,0 +1,37 @@
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:174: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed a `seed` instead of using `Env.seed` for resetting the environment random number generator.
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:187: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed `options` to allow the environment initialisation to be passed additional information.
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:195: UserWarning: [33mWARN: The result returned by `env.reset()` was not a tuple of the form `(obs, info)`, where `obs` is a observation and `info` is a dictionary containing additional information. Actual type: `<class 'numpy.ndarray'>`
+  logger.warn(
+Backend TkAgg is interactive backend. Turning interactive mode on.
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:219: DeprecationWarning: [33mWARN: Core environment is written in old step API which returns one bool instead of two. It is recommended to rewrite the environment with new step API. 
+  logger.deprecation(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:225: DeprecationWarning: `np.bool8` is a deprecated alias for `np.bool_`.  (Deprecated NumPy 1.24)
+  if not isinstance(done, (bool, np.bool8)):
+global_step=448, ep_r=[0.], ep_l=[57]
+global_step=456, ep_r=[0.], ep_l=[58]
+global_step=472, ep_r=[0.], ep_l=[60]
+global_step=496, ep_r=[1.], ep_l=[63]
+global_step=528, ep_r=[0.], ep_l=[67]
+global_step=848, ep_r=[0.], ep_l=[44]
+global_step=848, ep_r=[0.], ep_l=[107]
+global_step=880, ep_r=[2.], ep_l=[54]
+global_step=928, ep_r=[0.], ep_l=[57]
+global_step=976, ep_r=[8.], ep_l=[123]
+global_step=976, ep_r=[0.], ep_l=[65]
+global_step=1032, ep_r=[0.], ep_l=[63]
+global_step=1168, ep_r=[2.], ep_l=[147]
+global_step=1176, ep_r=[0.], ep_l=[41]
+global_step=1304, ep_r=[0.], ep_l=[53]
+global_step=1424, ep_r=[0.], ep_l=[62]
+global_step=1432, ep_r=[0.], ep_l=[73]
+global_step=1456, ep_r=[0.], ep_l=[60]
+global_step=1488, ep_r=[1.], ep_l=[64]
+global_step=1600, ep_r=[0.], ep_l=[71]
+global_step=1616, ep_r=[1.], ep_l=[55]
+global_step=1800, ep_r=[0.], ep_l=[62]
+global_step=1896, ep_r=[0.], ep_l=[59]
+global_step=1960, ep_r=[2.], ep_l=[59]
+global_step=1976, ep_r=[2.], ep_l=[101]
+global_step=1992, ep_r=[5.], ep_l=[67]

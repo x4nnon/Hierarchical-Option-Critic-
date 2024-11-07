@@ -1,0 +1,43 @@
+
+Backend TkAgg is interactive backend. Turning interactive mode on.
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:174: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed a `seed` instead of using `Env.seed` for resetting the environment random number generator.
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:187: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed `options` to allow the environment initialisation to be passed additional information.
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:195: UserWarning: [33mWARN: The result returned by `env.reset()` was not a tuple of the form `(obs, info)`, where `obs` is a observation and `info` is a dictionary containing additional information. Actual type: `<class 'numpy.ndarray'>`
+  logger.warn(
+Traceback (most recent call last):
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/x4nno/.cursor/extensions/ms-python.debugpy-2024.6.0-linux-x64/bundled/libs/debugpy/adapter/../../debugpy/launcher/../../debugpy/__main__.py", line 39, in <module>
+    cli.main()
+  File "/home/x4nno/.cursor/extensions/ms-python.debugpy-2024.6.0-linux-x64/bundled/libs/debugpy/adapter/../../debugpy/launcher/../../debugpy/../debugpy/server/cli.py", line 430, in main
+    run()
+  File "/home/x4nno/.cursor/extensions/ms-python.debugpy-2024.6.0-linux-x64/bundled/libs/debugpy/adapter/../../debugpy/launcher/../../debugpy/../debugpy/server/cli.py", line 284, in run_file
+    runpy.run_path(target, run_name="__main__")
+  File "/home/x4nno/.cursor/extensions/ms-python.debugpy-2024.6.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 321, in run_path
+    return _run_module_code(code, init_globals, run_name,
+  File "/home/x4nno/.cursor/extensions/ms-python.debugpy-2024.6.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 135, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/home/x4nno/.cursor/extensions/ms-python.debugpy-2024.6.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 124, in _run_code
+    exec(code, run_globals)
+  File "/home/x4nno/Documents/PhD/HOC/methods/HOC.py", line 564, in <module>
+    main_training_loop(agent, args, writer, envs, device)
+  File "/home/x4nno/Documents/PhD/HOC/methods/HOC.py", line 495, in main_training_loop
+    new_options = agent.select_option(next_obs[current_options == -1], current_meta_options[current_options == -1])
+  File "/home/x4nno/Documents/PhD/HOC/OC_agents/HOC_agent.py", line 186, in select_option
+    option_logits_list[mask] = self.policys_over_options[meta_option_idx](selected_states)
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/x4nno/Documents/PhD/HOC/OC_agents/HOC_agent.py", line 36, in forward
+    x = F.relu(self.fc1(state_rep))
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/linear.py", line 116, in forward
+    return F.linear(input, self.weight, self.bias)

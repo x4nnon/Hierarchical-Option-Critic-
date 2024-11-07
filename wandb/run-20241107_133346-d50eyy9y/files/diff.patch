@@ -1,0 +1,632 @@
+diff --git a/OC_agents/HOC_agent.py b/OC_agents/HOC_agent.py
+index 1676629..87c3e2a 100644
+--- a/OC_agents/HOC_agent.py
++++ b/OC_agents/HOC_agent.py
+@@ -6,7 +6,6 @@ Created on Wed Sep 11 09:58:01 2024
+ @author: x4nno
+ """
+ 
+-
+ import torch
+ import torch.nn.functional as F
+ import torch.nn as nn
+@@ -16,40 +15,28 @@ from torch.distributions import Categorical
+ import wandb
+ 
+ class ProcGenActor(nn.Module):
+-    def __init__(self, input_channels, num_options, num_actions, hidden_dim):
++    def __init__(self, num_options, num_actions, hidden_dim):
+         super(ProcGenActor, self).__init__()
+-        self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=3, stride=2)
+-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=2)
+-        self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=2)
++
+         self.fc1 = nn.Linear(64 * 7 * 7, hidden_dim)
+         self.fc2 = nn.Linear(hidden_dim, num_options)  # Output for both options and primitive actions
+ 
+     def forward(self, state):
+-        x = F.relu(self.conv1(state))
+-        x = F.relu(self.conv2(x))
+-        x = F.relu(self.conv3(x))
+-        x = x.reshape(x.size(0), -1)  # Flatten the tensor
+         x = F.relu(self.fc1(x))
+         x = self.fc2(x)  # Output logits for options + primitive actions
+         return x
+ 
+ 
+ class ProcGenIntraActor(nn.Module):
+-    def __init__(self, input_channels, num_actions, num_options, hidden_dim):
++    def __init__(self, num_actions, num_options, hidden_dim):
+         self.num_options = num_options
+         self.num_actions = num_actions
+         super(ProcGenIntraActor, self).__init__()
+-        self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=3, stride=2)
+-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=2)
+-        self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=2)
++
+         self.fc1 = nn.Linear(64 * 7 * 7, hidden_dim)
+         self.fc2 = nn.Linear(hidden_dim, num_actions * num_options)  # Output logits for all actions and options
+         
+     def forward(self, state):
+-        x = F.relu(self.conv1(state))
+-        x = F.relu(self.conv2(x))
+-        x = F.relu(self.conv3(x))
+-        x = x.reshape(x.size(0), -1)  # Flatten the tensor
+         x = F.relu(self.fc1(x))
+         x = self.fc2(x)
+         x = x.reshape(-1, self.num_options, self.num_actions)  # Reshape to (batch_size, num_options, num_actions)
+@@ -57,15 +44,11 @@ class ProcGenIntraActor(nn.Module):
+ 
+     
+ class ProcGenCritic(nn.Module):
+-    def __init__(self, input_channels, num_options, num_actions, hidden_dim):
++    def __init__(self, num_options, num_actions, hidden_dim):
+         super(ProcGenCritic, self).__init__()
+         self.num_options = num_options
+         self.num_actions = num_actions
+ 
+-        # Convolutional layers for state representation
+-        self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=3, stride=2)
+-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=2)
+-        self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=2)
+         self.fc1 = nn.Linear(64 * 7 * 7, hidden_dim)
+         
+         # Output Q-values for both options and actions
+@@ -74,11 +57,6 @@ class ProcGenCritic(nn.Module):
+         
+ 
+     def forward(self, state):
+-        # Forward pass through convolutional layers for state representation
+-        x = F.relu(self.conv1(state))
+-        x = F.relu(self.conv2(x))
+-        x = F.relu(self.conv3(x))
+-        x = x.reshape(x.size(0), -1)  # Flatten the tensor
+ 
+         x = F.relu(self.fc1(x))  # Final hidden representation of the state
+ 
+@@ -89,24 +67,31 @@ class ProcGenCritic(nn.Module):
+         return q_options, q_actions  # Return Q-values for options and actions
+     
+ class ProcGenMetaActor(nn.Module):
+-    def __init__(self, input_channels, num_meta_options, hidden_dim):
++    def __init__(self, num_meta_options, hidden_dim):
+         super(ProcGenMetaActor, self).__init__()
++        self.fc1 = nn.Linear(64 * 7 * 7, hidden_dim)
++        self.fc2 = nn.Linear(hidden_dim, num_meta_options)
++
++    def forward(self, state):
++        x = F.relu(self.fc1(x))
++        x = self.fc2(x)
++        return x
++    
++
++class SharedStateRepresentation(nn.Module):
++    def __init__(self, input_channels):
++        super(SharedStateRepresentation, self).__init__()
+         self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=3, stride=2)
+         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=2)
+         self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=2)
+-        self.fc1 = nn.Linear(64 * 7 * 7, hidden_dim)
+-        self.fc2 = nn.Linear(hidden_dim, num_meta_options)
+ 
+     def forward(self, state):
+         x = F.relu(self.conv1(state))
+         x = F.relu(self.conv2(x))
+         x = F.relu(self.conv3(x))
+         x = x.reshape(x.size(0), -1)
+-        x = F.relu(self.fc1(x))
+-        x = self.fc2(x)
+-        return x
+-    
+-    
++
++
+ class HOCAgent(nn.Module):
+     def __init__(self, input_channels, num_meta_options, num_options, num_actions, hidden_dim, gamma=0.99, learning_rate=0.001):
+         super().__init__()
+@@ -116,15 +101,17 @@ class HOCAgent(nn.Module):
+         self.gamma = gamma
+ 
+         # Meta-option policy
+-        self.meta_option_policy = ProcGenMetaActor(input_channels, num_meta_options, hidden_dim)
++        self.meta_option_policy = ProcGenMetaActor(num_meta_options, hidden_dim)
+         # Policy over options
+-        self.policy_over_options = ProcGenActor(input_channels, num_options, num_actions, hidden_dim)
++        self.policy_over_options = ProcGenActor(num_options, num_actions, hidden_dim)
+         # Intra-option policy
+-        self.intra_option_policy = ProcGenIntraActor(input_channels, num_actions, num_options, hidden_dim)
++        self.intra_option_policy = ProcGenIntraActor(num_actions, num_options, hidden_dim)
+         # Critic for option-value estimation
+-        self.critic = ProcGenCritic(input_channels, num_options, num_actions, hidden_dim)
++        self.critic = ProcGenCritic(num_options, num_actions, hidden_dim)
+         # Critic for meta-option-value estimation
+-        self.meta_critic = ProcGenCritic(input_channels, num_meta_options, num_actions, hidden_dim)
++        self.meta_critic = ProcGenCritic(num_meta_options, num_actions, hidden_dim)
++        #shared state representation
++        self.forward_state_rep = SharedStateRepresentation(input_channels)
+ 
+         # Termination networks for options and meta-options
+         self.option_termination = nn.Linear(hidden_dim + num_options, 1)
+@@ -136,24 +123,13 @@ class HOCAgent(nn.Module):
+                           + list(self.meta_critic.parameters()) + list(self.option_termination.parameters()) \
+                           + list(self.meta_termination.parameters())
+         self.optimizer = optim.Adam(self.all_params, lr=learning_rate)
+-        
+-        
+-    def forward_state_rep(self, state):
+-        """
+-        Forward pass to compute the state representation shared across policies.
+-        """
+-        x = F.relu(self.conv1(state))
+-        x = F.relu(self.conv2(x))
+-        x = F.relu(self.conv3(x))
+-        x = x.reshape(x.size(0), -1)  # Flatten
+-        x = F.relu(self.fc1(x))
+-        return x
+-        
+-        
++                
+     def select_meta_option(self, state):
+         """
+         Select a meta-option using the meta-option policy.
+         """
++        if state.shape[-1] == 3:
++            state = state.permute(0, 3, 1, 2)
+         state_rep = self.forward_state_rep(state)
+         meta_option_logits = self.meta_option_policy(state_rep)
+         meta_option_probs = Categorical(logits=meta_option_logits)
+@@ -164,6 +140,8 @@ class HOCAgent(nn.Module):
+         """
+         Select an option based on the current meta-option.
+         """
++        if state.shape[-1] == 3:
++            state = state.permute(0, 3, 1, 2)
+         state_rep = self.forward_state_rep(state)
+         option_logits = self.policy_over_options(state_rep)
+         option_probs = Categorical(logits=option_logits)
+@@ -174,6 +152,8 @@ class HOCAgent(nn.Module):
+         """
+         Select an action using the intra-option policy for the given option.
+         """
++        if state.shape[-1] == 3:
++            state = state.permute(0, 3, 1, 2)
+         state_rep = self.forward_state_rep(state)
+         action_logits = self.intra_option_policy(state_rep)
+         batch_size = state_rep.size(0)
+@@ -187,6 +167,8 @@ class HOCAgent(nn.Module):
+         """
+         Compute termination probability for meta-options.
+         """
++        if state.shape[-1] == 3:
++            state = state.permute(0, 3, 1, 2)
+         state_rep = self.forward_state_rep(state)
+         meta_option_one_hot = F.one_hot(meta_option, num_classes=self.num_meta_options).float()
+         combined_input = torch.cat([state_rep, meta_option_one_hot], dim=-1)
+@@ -197,6 +179,8 @@ class HOCAgent(nn.Module):
+         """
+         Compute termination probability for regular options.
+         """
++        if state.shape[-1] == 3:
++            state = state.permute(0, 3, 1, 2)
+         state_rep = self.forward_state_rep(state)
+         option_one_hot = F.one_hot(option, num_classes=self.num_options).float()
+         combined_input = torch.cat([state_rep, option_one_hot], dim=-1)
+@@ -207,6 +191,8 @@ class HOCAgent(nn.Module):
+         """
+         Compute the Q-value for the given state and meta-option.
+         """
++        if state.shape[-1] == 3:
++            state = state.permute(0, 3, 1, 2)
+         state_rep = self.forward_state_rep(state)
+         q_meta_options, _ = self.meta_critic(state_rep)
+         q_meta_option_value = torch.gather(q_meta_options, 1, meta_option.unsqueeze(1)).squeeze(1)
+@@ -216,6 +202,8 @@ class HOCAgent(nn.Module):
+         """
+         Compute the Q-value for the given state and regular option.
+         """
++        if state.shape[-1] == 3:
++            state = state.permute(0, 3, 1, 2)
+         state_rep = self.forward_state_rep(state)
+         q_options, _ = self.critic(state_rep)
+         q_option_value = torch.gather(q_options, 1, option.unsqueeze(1)).squeeze(1)
+@@ -224,7 +212,8 @@ class HOCAgent(nn.Module):
+ 
+     def update_function(self, batch, args, writer, global_step_truth):
+         states, actions, options, meta_options, rewards, dones = batch
+-
++        if states.shape[-1] == 3:
++            states = states.permute(0, 3, 1, 2)
+         # Compute the current state representation
+         state_reps = self.forward_state_rep(states)
+ 
+diff --git a/README.md b/README.md
+index 64d7727..52f5bff 100644
+--- a/README.md
++++ b/README.md
+@@ -1,194 +1 @@
+-# PPOC: Proximal Policy Optimization with Option Critic
+-
+-
+-## Overview
+-
+-PPOC is an advanced reinforcement learning framework that combines the strengths of Proximal Policy Optimization (PPO) and Option-Critic (OC) architectures. This implementation inspired by the paper **"Learnings Options End-to-End for Continuous Action
+-Tasks"** by Klissarov et al. However, the implementation is from the paper **"Accelerating Task Generalisation Using Multi-Level Hierarchical Options"** by Cannon and Simsek.
+-
+-## Key Features
+-
+-- **Proximal Policy Optimization**: Utilizes PPO for stable and efficient policy updates.
+-- **Option-Critic Architecture**: Integrates OC to enable dynamic option selection and termination.
+-
+-- **Stability**: Typically OC has option collapse issues. In this implementation PPO is applied to both levels of the hierarchy. It has been tested at 25 options and no option collapse was observed.
+-
+-## Installation
+-
+-To get started with PPOC, clone the repository and install the required dependencies:
+-
+-```bash
+-git clone https://github.com/x4nnon/PPOC.git
+-```
+-
+-cd PPOC
+-
+-pip install -r requirements.txt
+-```
+-
+-## Usage
+-
+-The main script for running PPOC is `OC_PPO.py`. The script can be executed with various arguments defined in the `Args` class. Below is an example of how to run the script:
+-
+-```bash
+-python3 methods/OC_PPO.py --env_id="procgen:procgen-fruitbot-v0" --total_timesteps=20000000 --num_envs=32
+-```
+-
+-### Arguments
+-
+-- **`exp_name`**: The name of the experiment. This is used for logging and tracking purposes.  
+-  **Default**: `os.path.basename(__file__)[: -len(".py")]`
+-
+-- **`seed`**: An integer seed for random number generation to ensure reproducibility of results.  
+-  **Default**: `0`
+-
+-- **`torch_deterministic`**: A boolean flag to enable deterministic behavior in PyTorch operations.  
+-  **Default**: `False`
+-
+-- **`cuda`**: A boolean flag to enable CUDA for GPU acceleration. Set to `True` to use GPU if available.  
+-  **Default**: `True`
+-
+-- **`track`**: A boolean flag to enable tracking of experiments using tools like Weights & Biases.  
+-  **Default**: `True`
+-
+-- **`wandb_project_name`**: The name of the Weights & Biases project for logging experiment data.  
+-  **Default**: `"fracos_StarPilot_A_QuickTest"`
+-
+-- **`wandb_entity`**: The Weights & Biases entity (user or team) under which the project is logged.  
+-  **Default**: `"tpcannon"`
+-
+-- **`env_id`**: The identifier for the environment to be used, e.g., "procgen-bigfish".  
+-  **Default**: `"procgen-bigfish"`
+-
+-- **`total_timesteps`**: The total number of timesteps to run the training for.  
+-  **Default**: `100000`
+-
+-- **`learning_rate`**: The learning rate for the optimizer.  
+-  **Default**: `5e-4`
+-
+-- **`num_envs`**: The number of parallel environments to run.  
+-  **Default**: `8`
+-
+-- **`num_steps`**: The number of steps to run in each environment per update.  
+-  **Default**: `256`
+-
+-- **`anneal_lr`**: A boolean flag to enable learning rate annealing over time.  
+-  **Default**: `True`
+-
+-- **`gamma`**: The discount factor for future rewards.  
+-  **Default**: `0.999`
+-
+-- **`num_minibatches`**: The number of minibatches to split the data into for each update.  
+-  **Default**: `4`
+-
+-- **`update_epochs`**: The number of epochs to update the policy and value networks.  
+-  **Default**: `2`
+-
+-- **`report_epoch`**: The number of steps after which to report evaluation metrics.  
+-  **Default**: `81920`
+-
+-- **`anneal_ent`**: A boolean flag to enable annealing of the entropy coefficient.  
+-  **Default**: `True`
+-
+-- **`ent_coef_action`**: The coefficient for the entropy term in the action policy loss.  
+-  **Default**: `0.01`
+-
+-- **`ent_coef_option`**: The coefficient for the entropy term in the option policy loss.  
+-  **Default**: `0.01`
+-
+-- **`clip_coef`**: The coefficient for clipping the policy gradient.  
+-  **Default**: `0.1`
+-
+-- **`clip_vloss`**: A boolean flag to enable clipping of the value loss.  
+-  **Default**: `False`
+-
+-- **`vf_coef`**: The coefficient for the value function loss.  
+-  **Default**: `0.5`
+-
+-- **`norm_adv`**: A boolean flag to normalize advantages. Always set to `True`.  
+-  **Default**: `True`
+-
+-- **`max_grad_norm`**: The maximum norm for gradient clipping.  
+-  **Default**: `0.1`
+-
+-- **`batch_size`**: The size of the batch for updates. Calculated as `num_envs * num_steps`.  
+-  **Default**: `0` (calculated during runtime)
+-
+-- **`minibatch_size`**: The size of each minibatch. Calculated as `batch_size // num_minibatches`.  
+-  **Default**: `0` (calculated during runtime)
+-
+-- **`num_iterations`**: The number of iterations to run. Calculated as `total_timesteps // batch_size`.  
+-  **Default**: `0` (calculated during runtime)
+-
+-- **`max_ep_length`**: The maximum length of an episode.  
+-  **Default**: `990`
+-
+-- **`debug`**: A boolean flag to enable debug mode.  
+-  **Default**: `False`
+-
+-- **`proc_start`**: The starting level for procedurally generated environments.  
+-  **Default**: `1`
+-
+-- **`start_ood_level`**: The starting level for out-of-distribution evaluation.  
+-  **Default**: `420`
+-
+-- **`proc_num_levels`**: The number of levels for procedurally generated environments.  
+-  **Default**: `32`
+-
+-- **`proc_sequential`**: A boolean flag to enable sequential levels in procedurally generated environments.  
+-  **Default**: `False`
+-
+-- **`max_eval_ep_len`**: The maximum length of an evaluation episode.  
+-  **Default**: `1001`
+-
+-- **`easy`**: A boolean flag to enable easy mode for environments.  
+-  **Default**: `1`
+-
+-- **`eval_repeats`**: The number of times to repeat evaluations.  
+-  **Default**: `1`
+-
+-- **`use_monochrome`**: A boolean flag to use monochrome assets in environments.  
+-  **Default**: `0`
+-
+-- **`eval_interval`**: The interval at which to perform evaluations.  
+-  **Default**: `100000`
+-
+-- **`eval_specific_envs`**: The number of specific environments to evaluate.  
+-  **Default**: `32`
+-
+-- **`eval_batch_size`**: The batch size for evaluations.  
+-  **Default**: `32`
+-
+-- **`gae_lambda`**: The lambda parameter for Generalized Advantage Estimation.  
+-  **Default**: `0.95`
+-
+-- **`warmup`**: A boolean flag to enable warmup mode if this is off, you will need a trained model.  
+-  **Default**: `1`
+-
+-- **`num_options`**: The number of options available to the agent.  
+-  **Default**: `25`
+-
+-## Citing PPOC
+-
+-If you use PPOC in your research, please cite the following papers:
+-
+-1. **PPOC Paper**: [Learnings Options End-to-End for Continuous Action Tasks]
+-   - Authors: [Klissarov et al.]
+-
+-2. **PPO Paper**: [Proximal Policy Optimization Algorithms]
+-   - Authors: [John Schulman et al.]
+-
+-3. **OC Paper**: [The Option-Critic Architecture]
+-   - Authors: [Pierre-Luc Bacon et al.]
+-
+-4. **Accelerating Task Generalisation Using Multi-Level Hierarchical Options**:
+-   - Authors: [Cannon and Simsek]
+-
+-
+-## License
+-
+-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+-
+-## Contact
+-
+-For questions or feedback, please contact [Your Name] at [Your Email].
+\ No newline at end of file
++IN PROGRESS
+\ No newline at end of file
+diff --git a/methods/HOC.py b/methods/HOC.py
+index 6ef483b..e8f5e8f 100644
+--- a/methods/HOC.py
++++ b/methods/HOC.py
+@@ -4,14 +4,15 @@ import time
+ from dataclasses import dataclass
+ from datetime import datetime
+ import sys
++sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) ## something wrong with VSCode cwd, this fixes
+ 
+ # Add relevant paths
+-sys.path.append("/home/x4nno/Documents/PhD/MetaGridEnv/MetaGridEnv")
+-sys.path.append("/home/x4nno/Documents/PhD/FRACOs_a")
+-sys.path.append("/home/x4nno_desktop/Documents/MetaGridEnv/MetaGridEnv")
+-sys.path.append("/home/x4nno_desktop/Documents/FRACOs_a")
++# sys.path.append("/home/x4nno/Documents/PhD/MetaGridEnv/MetaGridEnv")
++# sys.path.append("/home/x4nno/Documents/PhD/FRACOs_a")
++# sys.path.append("/home/x4nno_desktop/Documents/MetaGridEnv/MetaGridEnv")
++# sys.path.append("/home/x4nno_desktop/Documents/FRACOs_a")
+ 
+-sys.path.append("/app")
++# sys.path.append("/app")
+ 
+ from gym import Wrapper
+ import gym as gym_old # for procgen 
+@@ -33,9 +34,6 @@ import torch.nn.functional as F
+ 
+ from matplotlib import pyplot as plt
+ 
+-# Register the MetaGridEnv
+-register( id="MetaGridEnv/metagrid-v0",
+-          entry_point="metagrid_gymnasium_wrapper:MetaGridEnv")
+ 
+ # Import your Option-Critic Agent
+ from OC_agents.HOC_agent import HOCAgent  # Assuming you have saved the OC agent code in option_critic.py
+@@ -514,13 +512,26 @@ if __name__ == "__main__":
+ 
+     device = torch.device("cuda" if torch.cuda.is_available() and args.cuda else "cpu")
+ 
++    args.batch_size = int(args.num_envs * args.num_steps)
++    args.minibatch_size = int(args.batch_size // args.num_minibatches)
++    args.num_iterations = args.total_timesteps // args.batch_size
++    run_name = f"HOC_{args.env_id}__{args.seed}__{datetime.now()}"
++
+     envs = SyncVectorEnv([make_env(args.env_id, i, args.capture_video, run_name, args, sl=args.proc_start, nl=args.proc_num_levels, easy=args.easy) for i in range(args.num_envs)])
+     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
++    
++    if args.track and not args.debug:
++        import wandb
++        wandb.init(project=args.wandb_project_name, entity=args.wandb_entity, sync_tensorboard=True, config=vars(args), name=run_name, monitor_gym=True, save_code=True)
+ 
+-    run_name = f"HOC_{args.env_id}__{args.seed}__{datetime.now()}"
+     writer = SummaryWriter(f"runs/{run_name}")
+     writer.add_text("hyperparameters", "|param|value|\n|-|-|\n%s" % ("\n".join([f"|{key}|{value}|" for key, value in vars(args).items()])))
+ 
++    random.seed(args.seed)
++    np.random.seed(args.seed)
++    torch.manual_seed(args.seed)
++    torch.backends.cudnn.deterministic = args.torch_deterministic
++
+     agent = HOCAgent(
+             input_channels=3,
+             num_meta_options=4,
+diff --git a/utils/__pycache__/sync_vector_env.cpython-310.pyc b/utils/__pycache__/sync_vector_env.cpython-310.pyc
+index e4b4df4..a10469a 100644
+Binary files a/utils/__pycache__/sync_vector_env.cpython-310.pyc and b/utils/__pycache__/sync_vector_env.cpython-310.pyc differ
+diff --git a/wandb/debug-cli.x4nno.log b/wandb/debug-cli.x4nno.log
+index 49069ef..0423d1d 100644
+--- a/wandb/debug-cli.x4nno.log
++++ b/wandb/debug-cli.x4nno.log
+@@ -45,3 +45,91 @@
+ 2024-11-05 18:11:34 INFO No path found after runs/OC_procgen-bigfish__OC_PPO__0__2024-11-05 18:10:45.765934/events.out.tfevents.1730830252.pop-os.139188.0
+ 2024-11-05 18:11:35 INFO No path found after runs/OC_procgen-bigfish__OC_PPO__0__2024-11-05 18:10:45.765934/events.out.tfevents.1730830252.pop-os.139188.0
+ 2024-11-05 18:11:36 INFO No path found after runs/OC_procgen-bigfish__OC_PPO__0__2024-11-05 18:10:45.765934/events.out.tfevents.1730830252.pop-os.139188.0
++2024-11-07 13:06:27 INFO Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
++2024-11-07 13:06:27 INFO NumExpr defaulting to 8 threads.
++2024-11-07 13:06:28 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:06:17.788908/events.out.tfevents.1730984786.pop-os.24457.0
++2024-11-07 13:06:28 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:06:17.788908/events.out.tfevents.1730984786.pop-os.24457.0
++2024-11-07 13:06:28 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:06:17.788908/events.out.tfevents.1730984786.pop-os.24457.0
++2024-11-07 13:06:29 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:06:17.788908/events.out.tfevents.1730984786.pop-os.24457.0
++2024-11-07 13:06:30 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:06:17.788908/events.out.tfevents.1730984786.pop-os.24457.0
++2024-11-07 13:06:31 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:06:17.788908/events.out.tfevents.1730984786.pop-os.24457.0
++2024-11-07 13:06:32 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:06:17.788908/events.out.tfevents.1730984786.pop-os.24457.0
++2024-11-07 13:06:33 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:06:17.788908/events.out.tfevents.1730984786.pop-os.24457.0
++2024-11-07 13:06:34 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:06:17.788908/events.out.tfevents.1730984786.pop-os.24457.0
++2024-11-07 13:29:22 INFO Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
++2024-11-07 13:29:22 INFO NumExpr defaulting to 8 threads.
++2024-11-07 13:29:22 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:29:08.815852/events.out.tfevents.1730986160.pop-os.25632.0
++2024-11-07 13:29:22 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:29:08.815852/events.out.tfevents.1730986160.pop-os.25632.0
++2024-11-07 13:29:22 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:29:08.815852/events.out.tfevents.1730986160.pop-os.25632.0
++2024-11-07 13:29:23 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:29:08.815852/events.out.tfevents.1730986160.pop-os.25632.0
++2024-11-07 13:29:24 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:29:08.815852/events.out.tfevents.1730986160.pop-os.25632.0
++2024-11-07 13:29:25 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:29:08.815852/events.out.tfevents.1730986160.pop-os.25632.0
++2024-11-07 13:29:26 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:29:08.815852/events.out.tfevents.1730986160.pop-os.25632.0
++2024-11-07 13:29:27 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:29:08.815852/events.out.tfevents.1730986160.pop-os.25632.0
++2024-11-07 13:29:28 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:29:08.815852/events.out.tfevents.1730986160.pop-os.25632.0
++2024-11-07 13:30:40 INFO Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
++2024-11-07 13:30:40 INFO NumExpr defaulting to 8 threads.
++2024-11-07 13:30:41 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:42 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:43 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:44 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:45 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:46 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:47 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:48 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:49 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:50 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:51 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:52 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:53 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:54 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:55 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:56 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:57 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:58 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:30:59 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:00 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:01 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:02 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:03 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:04 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:05 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:06 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:07 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:08 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:09 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:10 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:11 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:12 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:13 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:14 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:15 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:16 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:17 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:18 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:19 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:20 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:21 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:22 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:23 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:24 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:25 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:26 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:27 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:28 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:29 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:30 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:31 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:32 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:33 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:34 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:35 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:36 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:37 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:38 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:39 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:40 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:41 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:42 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:43 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
++2024-11-07 13:31:44 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485/events.out.tfevents.1730986238.pop-os.25989.0
+diff --git a/wandb/debug-internal.log b/wandb/debug-internal.log
+index 074a231..00da69f 120000
+--- a/wandb/debug-internal.log
++++ b/wandb/debug-internal.log
+@@ -1 +1 @@
+-run-20241105_181047-z9dyf9tu/logs/debug-internal.log
+\ No newline at end of file
++run-20241107_133346-d50eyy9y/logs/debug-internal.log
+\ No newline at end of file
+diff --git a/wandb/debug.log b/wandb/debug.log
+index 9c6dd02..92174e2 120000
+--- a/wandb/debug.log
++++ b/wandb/debug.log
+@@ -1 +1 @@
+-run-20241105_181047-z9dyf9tu/logs/debug.log
+\ No newline at end of file
++run-20241107_133346-d50eyy9y/logs/debug.log
+\ No newline at end of file
+diff --git a/wandb/latest-run b/wandb/latest-run
+index bd0a7ab..dfece2c 120000
+--- a/wandb/latest-run
++++ b/wandb/latest-run
+@@ -1 +1 @@
+-run-20241105_181047-z9dyf9tu
+\ No newline at end of file
++run-20241107_133346-d50eyy9y
+\ No newline at end of file

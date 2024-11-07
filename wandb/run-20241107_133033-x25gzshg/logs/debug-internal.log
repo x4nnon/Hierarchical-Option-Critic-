@@ -1,0 +1,98 @@
+2024-11-07 13:30:33,091 INFO    StreamThr :26071 [internal.py:wandb_internal():85] W&B internal server running at pid: 26071, started at: 2024-11-07 13:30:33.088665
+2024-11-07 13:30:33,104 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: status
+2024-11-07 13:30:33,118 INFO    WriterThread:26071 [datastore.py:open_for_write():87] open: /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_133033-x25gzshg/run-x25gzshg.wandb
+2024-11-07 13:30:33,120 DEBUG   SenderThread:26071 [sender.py:send():378] send: header
+2024-11-07 13:30:33,130 DEBUG   SenderThread:26071 [sender.py:send():378] send: run
+2024-11-07 13:30:33,622 INFO    SenderThread:26071 [dir_watcher.py:__init__():211] watching files in: /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_133033-x25gzshg/files
+2024-11-07 13:30:33,623 INFO    SenderThread:26071 [sender.py:_start_run_threads():1123] run started: x25gzshg with start time 1730986233.087303
+2024-11-07 13:30:33,635 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: check_version
+2024-11-07 13:30:33,636 DEBUG   SenderThread:26071 [sender.py:send_request():405] send_request: check_version
+2024-11-07 13:30:33,787 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: run_start
+2024-11-07 13:30:33,800 DEBUG   HandlerThread:26071 [system_info.py:__init__():26] System info init
+2024-11-07 13:30:33,800 DEBUG   HandlerThread:26071 [system_info.py:__init__():41] System info init done
+2024-11-07 13:30:33,800 INFO    HandlerThread:26071 [system_monitor.py:start():194] Starting system monitor
+2024-11-07 13:30:33,801 INFO    HandlerThread:26071 [system_monitor.py:probe():214] Collecting system info
+2024-11-07 13:30:33,802 INFO    SystemMonitor:26071 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2024-11-07 13:30:33,805 INFO    SystemMonitor:26071 [interfaces.py:start():188] Started cpu monitoring
+2024-11-07 13:30:33,807 INFO    SystemMonitor:26071 [interfaces.py:start():188] Started disk monitoring
+2024-11-07 13:30:33,810 INFO    SystemMonitor:26071 [interfaces.py:start():188] Started gpu monitoring
+2024-11-07 13:30:33,814 INFO    SystemMonitor:26071 [interfaces.py:start():188] Started memory monitoring
+2024-11-07 13:30:33,819 INFO    SystemMonitor:26071 [interfaces.py:start():188] Started network monitoring
+2024-11-07 13:30:33,843 DEBUG   HandlerThread:26071 [system_info.py:probe():150] Probing system
+2024-11-07 13:30:33,850 DEBUG   HandlerThread:26071 [system_info.py:_probe_git():135] Probing git
+2024-11-07 13:30:33,860 DEBUG   HandlerThread:26071 [system_info.py:_probe_git():143] Probing git done
+2024-11-07 13:30:33,861 DEBUG   HandlerThread:26071 [system_info.py:probe():198] Probing system done
+2024-11-07 13:30:33,861 DEBUG   HandlerThread:26071 [system_monitor.py:probe():223] {'os': 'Linux-6.9.3-76060903-generic-x86_64-with-glibc2.35', 'python': '3.10.14', 'heartbeatAt': '2024-11-07T13:30:33.844078', 'startedAt': '2024-11-07T13:30:33.067678', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '/home/x4nno/Documents/PhD/HOC/methods/HOC.py', 'codePathLocal': 'methods/HOC.py', 'codePath': 'methods/HOC.py', 'git': {'remote': 'https://github.com/x4nnon/Hierarchical-Option-critic-.git', 'commit': '6c1d07b1aab7c47262b33c009550feff11461706'}, 'email': 'x4nnon@gmail.com', 'root': '/home/x4nno/Documents/PhD/HOC', 'host': 'pop-os', 'username': 'x4nno', 'executable': '/home/x4nno/anaconda3/envs/fracos_ppo/bin/python', 'cpu_count': 6, 'cpu_count_logical': 12, 'cpu_freq': {'current': 3252.28075, 'min': 800.0, 'max': 4500.0}, 'cpu_freq_per_core': [{'current': 3010.9, 'min': 800.0, 'max': 4500.0}, {'current': 3117.983, 'min': 800.0, 'max': 4500.0}, {'current': 3102.98, 'min': 800.0, 'max': 4500.0}, {'current': 3290.807, 'min': 800.0, 'max': 4500.0}, {'current': 2905.444, 'min': 800.0, 'max': 4500.0}, {'current': 4061.747, 'min': 800.0, 'max': 4500.0}, {'current': 2831.983, 'min': 800.0, 'max': 4500.0}, {'current': 2904.334, 'min': 800.0, 'max': 4500.0}, {'current': 3076.765, 'min': 800.0, 'max': 4500.0}, {'current': 4005.242, 'min': 800.0, 'max': 4500.0}, {'current': 3188.378, 'min': 800.0, 'max': 4500.0}, {'current': 2904.902, 'min': 800.0, 'max': 4500.0}], 'disk': {'/': {'total': 225.31660079956055, 'used': 212.2260856628418}}, 'gpu': 'NVIDIA GeForce RTX 2070 with Max-Q Design', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA GeForce RTX 2070 with Max-Q Design', 'memory_total': 8589934592}], 'memory': {'total': 15.513446807861328}}
+2024-11-07 13:30:33,861 INFO    HandlerThread:26071 [system_monitor.py:probe():224] Finished collecting system info
+2024-11-07 13:30:33,861 INFO    HandlerThread:26071 [system_monitor.py:probe():227] Publishing system info
+2024-11-07 13:30:33,861 DEBUG   HandlerThread:26071 [system_info.py:_save_conda():207] Saving list of conda packages installed into the current environment
+2024-11-07 13:30:34,627 INFO    Thread-17 :26071 [dir_watcher.py:_on_file_created():271] file/dir created: /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_133033-x25gzshg/files/conda-environment.yaml
+2024-11-07 13:30:37,148 DEBUG   HandlerThread:26071 [system_info.py:_save_conda():222] Saving conda packages done
+2024-11-07 13:30:37,148 DEBUG   HandlerThread:26071 [system_info.py:_save_code():44] Saving code
+2024-11-07 13:30:37,152 DEBUG   HandlerThread:26071 [system_info.py:_save_code():65] Saving code done
+2024-11-07 13:30:37,152 DEBUG   HandlerThread:26071 [system_info.py:_save_patches():82] Saving git patches
+2024-11-07 13:30:37,181 DEBUG   HandlerThread:26071 [system_info.py:_save_patches():124] Saving git patches done
+2024-11-07 13:30:37,183 INFO    HandlerThread:26071 [system_monitor.py:probe():229] Finished publishing system info
+2024-11-07 13:30:37,190 DEBUG   SenderThread:26071 [sender.py:send():378] send: files
+2024-11-07 13:30:37,190 INFO    SenderThread:26071 [sender.py:_save_file():1389] saving file wandb-metadata.json with policy now
+2024-11-07 13:30:37,191 INFO    SenderThread:26071 [sender.py:_save_file():1389] saving file code/methods/HOC.py with policy now
+2024-11-07 13:30:37,192 INFO    SenderThread:26071 [sender.py:_save_file():1389] saving file diff.patch with policy now
+2024-11-07 13:30:37,623 INFO    Thread-17 :26071 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_133033-x25gzshg/files/conda-environment.yaml
+2024-11-07 13:30:37,623 INFO    Thread-17 :26071 [dir_watcher.py:_on_file_created():271] file/dir created: /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_133033-x25gzshg/files/wandb-metadata.json
+2024-11-07 13:30:37,623 INFO    Thread-17 :26071 [dir_watcher.py:_on_file_created():271] file/dir created: /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_133033-x25gzshg/files/diff.patch
+2024-11-07 13:30:37,623 INFO    Thread-17 :26071 [dir_watcher.py:_on_file_created():271] file/dir created: /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_133033-x25gzshg/files/code/methods/HOC.py
+2024-11-07 13:30:37,624 INFO    Thread-17 :26071 [dir_watcher.py:_on_file_created():271] file/dir created: /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_133033-x25gzshg/files/code
+2024-11-07 13:30:37,624 INFO    Thread-17 :26071 [dir_watcher.py:_on_file_created():271] file/dir created: /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_133033-x25gzshg/files/code/methods
+2024-11-07 13:30:37,830 INFO    wandb-upload_0:26071 [upload_job.py:push():130] Uploaded file /tmp/tmp061zvst7wandb/7n3rd972-wandb-metadata.json
+2024-11-07 13:30:37,890 INFO    wandb-upload_2:26071 [upload_job.py:push():130] Uploaded file /tmp/tmp061zvst7wandb/yqc34cow-diff.patch
+2024-11-07 13:30:38,086 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: python_packages
+2024-11-07 13:30:38,087 DEBUG   SenderThread:26071 [sender.py:send_request():405] send_request: python_packages
+2024-11-07 13:30:38,090 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: stop_status
+2024-11-07 13:30:38,091 DEBUG   SenderThread:26071 [sender.py:send_request():405] send_request: stop_status
+2024-11-07 13:30:38,101 INFO    HandlerThread:26071 [handler.py:handle_tbrecord():783] handling tbrecord: tbrecord {
+  log_dir: "runs/HOC_procgen-starpilot__0__2024-11-07 13:30:29.125485"
+  save: true
+}
+control {
+  relay_id: "10060605dba64eb6b4e9d273d845e440"
+}
+_info {
+  stream_id: "x25gzshg"
+}
+
+2024-11-07 13:30:38,103 INFO    wandb-upload_1:26071 [upload_job.py:push():130] Uploaded file /tmp/tmp061zvst7wandb/2ej41q42-code/methods/HOC.py
+2024-11-07 13:30:38,104 DEBUG   HandlerThread:26071 [config_util.py:dict_from_config_file():70] no default config file found in config-defaults.yaml
+2024-11-07 13:30:38,578 DEBUG   SenderThread:26071 [sender.py:send():378] send: telemetry
+2024-11-07 13:30:38,578 DEBUG   SenderThread:26071 [sender.py:send():378] send: tbrecord
+2024-11-07 13:30:38,578 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: status_report
+2024-11-07 13:30:38,624 INFO    Thread-17 :26071 [dir_watcher.py:_on_file_created():271] file/dir created: /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_133033-x25gzshg/files/requirements.txt
+2024-11-07 13:30:41,564 DEBUG   SenderThread:26071 [sender.py:send():378] send: files
+2024-11-07 13:30:41,564 INFO    SenderThread:26071 [sender.py:_save_file():1389] saving file events.out.tfevents.1730986238.pop-os.25989.0 with policy live
+2024-11-07 13:30:41,642 INFO    Thread-17 :26071 [dir_watcher.py:_on_file_created():271] file/dir created: /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_133033-x25gzshg/files/events.out.tfevents.1730986238.pop-os.25989.0
+2024-11-07 13:30:41,643 INFO    Thread-17 :26071 [dir_watcher.py:_on_file_created():271] file/dir created: /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_133033-x25gzshg/files/output.log
+2024-11-07 13:30:42,027 INFO    wandb-upload_0:26071 [upload_job.py:push():130] Uploaded file /tmp/tmp061zvst7wandb/3sun35hm-events.out.tfevents.1730986238.pop-os.25989.0
+2024-11-07 13:30:43,643 INFO    Thread-17 :26071 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_133033-x25gzshg/files/output.log
+2024-11-07 13:30:44,566 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: status_report
+2024-11-07 13:30:49,818 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: status_report
+2024-11-07 13:30:50,648 INFO    Thread-17 :26071 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_133033-x25gzshg/files/output.log
+2024-11-07 13:30:53,091 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: stop_status
+2024-11-07 13:30:53,093 DEBUG   SenderThread:26071 [sender.py:send_request():405] send_request: stop_status
+2024-11-07 13:30:55,395 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: status_report
+2024-11-07 13:31:00,397 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: status_report
+2024-11-07 13:31:05,404 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: status_report
+2024-11-07 13:31:05,665 INFO    Thread-17 :26071 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_133033-x25gzshg/files/config.yaml
+2024-11-07 13:31:08,090 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: stop_status
+2024-11-07 13:31:08,091 DEBUG   SenderThread:26071 [sender.py:send_request():405] send_request: stop_status
+2024-11-07 13:31:11,452 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: status_report
+2024-11-07 13:31:16,454 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: status_report
+2024-11-07 13:31:21,456 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: status_report
+2024-11-07 13:31:23,092 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: stop_status
+2024-11-07 13:31:23,095 DEBUG   SenderThread:26071 [sender.py:send_request():405] send_request: stop_status
+2024-11-07 13:31:27,402 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: status_report
+2024-11-07 13:31:32,404 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: status_report
+2024-11-07 13:31:33,819 DEBUG   SystemMonitor:26071 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2024-11-07 13:31:33,825 DEBUG   SenderThread:26071 [sender.py:send():378] send: stats
+2024-11-07 13:31:37,827 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: status_report
+2024-11-07 13:31:38,092 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: stop_status
+2024-11-07 13:31:38,095 DEBUG   SenderThread:26071 [sender.py:send_request():405] send_request: stop_status
+2024-11-07 13:31:43,352 DEBUG   HandlerThread:26071 [handler.py:handle_request():158] handle_request: status_report

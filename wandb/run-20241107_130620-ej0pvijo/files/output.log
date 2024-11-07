@@ -1,0 +1,18 @@
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:174: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed a `seed` instead of using `Env.seed` for resetting the environment random number generator.
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:187: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed `options` to allow the environment initialisation to be passed additional information.
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:195: UserWarning: [33mWARN: The result returned by `env.reset()` was not a tuple of the form `(obs, info)`, where `obs` is a observation and `info` is a dictionary containing additional information. Actual type: `<class 'numpy.ndarray'>`
+  logger.warn(
+Traceback (most recent call last):
+  File "/home/x4nno/Documents/PhD/HOC/methods/HOC.py", line 545, in <module>
+    main_training_loop(agent, args, writer, envs, device)
+  File "/home/x4nno/Documents/PhD/HOC/methods/HOC.py", line 488, in main_training_loop
+    new_meta_options = agent.select_meta_option(next_obs[current_meta_options == -1])
+  File "/home/x4nno/Documents/PhD/HOC/OC_agents/HOC_agent.py", line 157, in select_meta_option
+    state_rep = self.forward_state_rep(state)
+  File "/home/x4nno/Documents/PhD/HOC/OC_agents/HOC_agent.py", line 145, in forward_state_rep
+    x = F.relu(self.conv1(state))
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1709, in __getattr__
+    raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
+AttributeError: 'HOCAgent' object has no attribute 'conv1'

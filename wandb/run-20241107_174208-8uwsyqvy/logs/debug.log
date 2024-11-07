@@ -1,0 +1,30 @@
+2024-11-07 17:42:08,349 INFO    MainThread:71389 [wandb_setup.py:_flush():76] Current SDK version is 0.17.0
+2024-11-07 17:42:08,349 INFO    MainThread:71389 [wandb_setup.py:_flush():76] Configure stats pid to 71389
+2024-11-07 17:42:08,349 INFO    MainThread:71389 [wandb_setup.py:_flush():76] Loading settings from /home/x4nno/.config/wandb/settings
+2024-11-07 17:42:08,349 INFO    MainThread:71389 [wandb_setup.py:_flush():76] Loading settings from /home/x4nno/Documents/PhD/HOC/wandb/settings
+2024-11-07 17:42:08,349 INFO    MainThread:71389 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2024-11-07 17:42:08,349 INFO    MainThread:71389 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2024-11-07 17:42:08,349 INFO    MainThread:71389 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'methods/HOC.py', 'program_abspath': '/home/x4nno/Documents/PhD/HOC/methods/HOC.py', 'program': '/home/x4nno/Documents/PhD/HOC/methods/HOC.py'}
+2024-11-07 17:42:08,349 INFO    MainThread:71389 [wandb_setup.py:_flush():76] Applying login settings: {}
+2024-11-07 17:42:08,349 INFO    MainThread:71389 [wandb_init.py:_log_setup():520] Logging user logs to /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_174208-8uwsyqvy/logs/debug.log
+2024-11-07 17:42:08,349 INFO    MainThread:71389 [wandb_init.py:_log_setup():521] Logging internal logs to /home/x4nno/Documents/PhD/HOC/wandb/run-20241107_174208-8uwsyqvy/logs/debug-internal.log
+2024-11-07 17:42:08,349 INFO    MainThread:71389 [wandb_init.py:init():560] calling init triggers
+2024-11-07 17:42:08,349 INFO    MainThread:71389 [wandb_init.py:init():567] wandb.init called with sweep_config: {}
+config: {'exp_name': 'HOC', 'seed': 0, 'torch_deterministic': False, 'cuda': True, 'track': True, 'wandb_project_name': 'HOC_StarPilot_A_QuickTest', 'wandb_entity': 'tpcannon', 'capture_video': False, 'env_id': 'procgen-starpilot', 'total_timesteps': 1000000, 'learning_rate': 0.0003, 'num_envs': 8, 'num_steps': 256, 'anneal_lr': True, 'gamma': 0.999, 'num_minibatches': 1, 'update_epochs': 4, 'report_epoch': 81920, 'anneal_ent': True, 'action_ent_coef': 0.005, 'option_ent_coef': 0.005, 'meta_ent_coef': 0.005, 'max_grad_norm': 0.1, 'batch_size': 2048, 'minibatch_size': 2048, 'num_iterations': 488, 'max_clusters_per_clusterer': 20, 'current_depth': 100, 'chain_length': 3, 'NN_cluster_search': True, 'gen_strength': 0.33, 'max_ep_length': 990, 'fix_mdp': False, 'gen_traj': False, 'top_only': False, 'debug': 0, 'proc_start': 1, 'start_ood_level': 420, 'proc_num_levels': 32, 'proc_sequential': False, 'max_eval_ep_len': 1001, 'sep_evals': 0, 'specific_proc_list_input': '(1,2,5,6,7,9,11,12,15,16)', 'easy': 1, 'eval_repeats': 1, 'use_monochrome': 0, 'eval_interval': 100000, 'eval_specific_envs': 32, 'eval_batch_size': 16, 'gae_lambda': 0.95, 'warmup': 1}
+2024-11-07 17:42:08,349 INFO    MainThread:71389 [wandb_init.py:init():610] starting backend
+2024-11-07 17:42:08,349 INFO    MainThread:71389 [wandb_init.py:init():614] setting up manager
+2024-11-07 17:42:08,352 INFO    MainThread:71389 [backend.py:_multiprocessing_setup():105] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2024-11-07 17:42:08,353 INFO    MainThread:71389 [wandb_init.py:init():622] backend started and connected
+2024-11-07 17:42:08,363 INFO    MainThread:71389 [wandb_init.py:init():711] updated telemetry
+2024-11-07 17:42:08,369 INFO    MainThread:71389 [wandb_init.py:init():744] communicating run to backend with 90.0 second timeout
+2024-11-07 17:42:08,863 INFO    MainThread:71389 [wandb_run.py:_on_init():2396] communicating current version
+2024-11-07 17:42:08,979 INFO    MainThread:71389 [wandb_run.py:_on_init():2405] got version response upgrade_message: "wandb version 0.18.6 is available!  To upgrade, please run:\n $ pip install wandb --upgrade"
+
+2024-11-07 17:42:08,980 INFO    MainThread:71389 [wandb_init.py:init():795] starting run threads in backend
+2024-11-07 17:42:12,799 INFO    MainThread:71389 [wandb_run.py:_console_start():2374] atexit reg
+2024-11-07 17:42:12,799 INFO    MainThread:71389 [wandb_run.py:_redirect():2229] redirect: wrap_raw
+2024-11-07 17:42:12,799 INFO    MainThread:71389 [wandb_run.py:_redirect():2294] Wrapping output streams.
+2024-11-07 17:42:12,799 INFO    MainThread:71389 [wandb_run.py:_redirect():2319] Redirects installed.
+2024-11-07 17:42:12,800 INFO    MainThread:71389 [wandb_init.py:init():838] run started, returning control to user process
+2024-11-07 17:42:12,800 INFO    MainThread:71389 [wandb_run.py:_tensorboard_callback():1538] tensorboard callback: runs/HOC_procgen-starpilot__0__2024-11-07 17:42:05.555908, True
+2024-11-07 17:42:34,132 WARNING MsgRouterThr:71389 [router.py:message_loop():77] message_loop has been closed

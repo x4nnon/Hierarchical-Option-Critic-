@@ -1,0 +1,188 @@
+wandb_version: 1
+
+exp_name:
+  desc: null
+  value: HOC
+seed:
+  desc: null
+  value: 0
+torch_deterministic:
+  desc: null
+  value: false
+cuda:
+  desc: null
+  value: true
+track:
+  desc: null
+  value: true
+wandb_project_name:
+  desc: null
+  value: HOC_StarPilot_A_QuickTest
+wandb_entity:
+  desc: null
+  value: tpcannon
+capture_video:
+  desc: null
+  value: false
+env_id:
+  desc: null
+  value: procgen-starpilot
+total_timesteps:
+  desc: null
+  value: 1000000
+learning_rate:
+  desc: null
+  value: 0.0003
+num_envs:
+  desc: null
+  value: 8
+num_steps:
+  desc: null
+  value: 256
+anneal_lr:
+  desc: null
+  value: true
+gamma:
+  desc: null
+  value: 0.999
+num_minibatches:
+  desc: null
+  value: 1
+update_epochs:
+  desc: null
+  value: 4
+report_epoch:
+  desc: null
+  value: 81920
+anneal_ent:
+  desc: null
+  value: true
+action_ent_coef:
+  desc: null
+  value: 0.005
+option_ent_coef:
+  desc: null
+  value: 0.005
+meta_ent_coef:
+  desc: null
+  value: 0.005
+max_grad_norm:
+  desc: null
+  value: 0.1
+batch_size:
+  desc: null
+  value: 2048
+minibatch_size:
+  desc: null
+  value: 2048
+num_iterations:
+  desc: null
+  value: 488
+max_clusters_per_clusterer:
+  desc: null
+  value: 20
+current_depth:
+  desc: null
+  value: 100
+chain_length:
+  desc: null
+  value: 3
+NN_cluster_search:
+  desc: null
+  value: true
+gen_strength:
+  desc: null
+  value: 0.33
+max_ep_length:
+  desc: null
+  value: 990
+fix_mdp:
+  desc: null
+  value: false
+gen_traj:
+  desc: null
+  value: false
+top_only:
+  desc: null
+  value: false
+debug:
+  desc: null
+  value: 0
+proc_start:
+  desc: null
+  value: 1
+start_ood_level:
+  desc: null
+  value: 420
+proc_num_levels:
+  desc: null
+  value: 32
+proc_sequential:
+  desc: null
+  value: false
+max_eval_ep_len:
+  desc: null
+  value: 1001
+sep_evals:
+  desc: null
+  value: 0
+specific_proc_list_input:
+  desc: null
+  value: (1,2,5,6,7,9,11,12,15,16)
+easy:
+  desc: null
+  value: 1
+eval_repeats:
+  desc: null
+  value: 1
+use_monochrome:
+  desc: null
+  value: 0
+eval_interval:
+  desc: null
+  value: 100000
+eval_specific_envs:
+  desc: null
+  value: 32
+eval_batch_size:
+  desc: null
+  value: 16
+gae_lambda:
+  desc: null
+  value: 0.95
+warmup:
+  desc: null
+  value: 1
+_wandb:
+  desc: null
+  value:
+    code_path: code/methods/HOC.py
+    python_version: 3.10.14
+    cli_version: 0.17.0
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1731001796
+    t:
+      1:
+      - 1
+      - 2
+      - 3
+      - 55
+      - 105
+      2:
+      - 1
+      - 2
+      - 3
+      - 55
+      - 105
+      3:
+      - 13
+      - 16
+      - 23
+      - 35
+      4: 3.10.14
+      5: 0.17.0
+      8:
+      - 5
+      13: linux-x86_64

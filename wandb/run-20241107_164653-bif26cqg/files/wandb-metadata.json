@@ -1,0 +1,108 @@
+{
+    "os": "Linux-6.9.3-76060903-generic-x86_64-with-glibc2.35",
+    "python": "3.10.14",
+    "heartbeatAt": "2024-11-07T16:46:54.594813",
+    "startedAt": "2024-11-07T16:46:53.510236",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/home/x4nno/Documents/PhD/HOC/methods/HOC.py",
+    "codePathLocal": "methods/HOC.py",
+    "codePath": "methods/HOC.py",
+    "git": {
+        "remote": "https://github.com/x4nnon/Hierarchical-Option-critic-.git",
+        "commit": "6c1d07b1aab7c47262b33c009550feff11461706"
+    },
+    "email": "x4nnon@gmail.com",
+    "root": "/home/x4nno/Documents/PhD/HOC",
+    "host": "pop-os",
+    "username": "x4nno",
+    "executable": "/home/x4nno/anaconda3/envs/fracos_ppo/bin/python",
+    "cpu_count": 6,
+    "cpu_count_logical": 12,
+    "cpu_freq": {
+        "current": 4058.8399166666663,
+        "min": 800.0,
+        "max": 4500.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 3961.186,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3504.12,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3790.302,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3855.687,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3500.065,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3692.451,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3500.06,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3499.832,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3500.032,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3499.73,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3496.968,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3932.859,
+            "min": 800.0,
+            "max": 4500.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 225.31660079956055,
+            "used": 212.3313751220703
+        }
+    },
+    "gpu": "NVIDIA GeForce RTX 2070 with Max-Q Design",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 2070 with Max-Q Design",
+            "memory_total": 8589934592
+        }
+    ],
+    "memory": {
+        "total": 15.513446807861328
+    }
+}

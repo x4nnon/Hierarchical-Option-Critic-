@@ -1,0 +1,33 @@
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:174: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed a `seed` instead of using `Env.seed` for resetting the environment random number generator.
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:187: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed `options` to allow the environment initialisation to be passed additional information.
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:195: UserWarning: [33mWARN: The result returned by `env.reset()` was not a tuple of the form `(obs, info)`, where `obs` is a observation and `info` is a dictionary containing additional information. Actual type: `<class 'numpy.ndarray'>`
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:219: DeprecationWarning: [33mWARN: Core environment is written in old step API which returns one bool instead of two. It is recommended to rewrite the environment with new step API. 
+  logger.deprecation(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:225: DeprecationWarning: `np.bool8` is a deprecated alias for `np.bool_`.  (Deprecated NumPy 1.24)
+  if not isinstance(done, (bool, np.bool8)):
+global_step=232, ep_r=[0.], ep_l=[30]
+global_step=408, ep_r=[0.], ep_l=[52]
+global_step=440, ep_r=[3.], ep_l=[56]
+global_step=448, ep_r=[0.], ep_l=[27]
+global_step=560, ep_r=[4.], ep_l=[71]
+global_step=608, ep_r=[0.], ep_l=[77]
+global_step=816, ep_r=[0.], ep_l=[51]
+global_step=904, ep_r=[9.], ep_l=[114]
+global_step=912, ep_r=[0.], ep_l=[58]
+global_step=1056, ep_r=[1.], ep_l=[77]
+global_step=1128, ep_r=[2.], ep_l=[142]
+global_step=1152, ep_r=[4.], ep_l=[74]
+global_step=1160, ep_r=[1.], ep_l=[69]
+global_step=1192, ep_r=[2.], ep_l=[150]
+global_step=1216, ep_r=[1.], ep_l=[50]
+global_step=1448, ep_r=[1.], ep_l=[49]
+global_step=1496, ep_r=[3.], ep_l=[74]
+global_step=1496, ep_r=[0.], ep_l=[73]
+global_step=1760, ep_r=[4.], ep_l=[76]
+global_step=1768, ep_r=[2.], ep_l=[72]
+global_step=1928, ep_r=[1.], ep_l=[60]
+global_step=1936, ep_r=[1.], ep_l=[90]
+global_step=1984, ep_r=[2.], ep_l=[103]

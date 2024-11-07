@@ -1,0 +1,41 @@
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:174: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed a `seed` instead of using `Env.seed` for resetting the environment random number generator.
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:187: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed `options` to allow the environment initialisation to be passed additional information.
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:195: UserWarning: [33mWARN: The result returned by `env.reset()` was not a tuple of the form `(obs, info)`, where `obs` is a observation and `info` is a dictionary containing additional information. Actual type: `<class 'numpy.ndarray'>`
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:219: DeprecationWarning: [33mWARN: Core environment is written in old step API which returns one bool instead of two. It is recommended to rewrite the environment with new step API. 
+  logger.deprecation(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:225: DeprecationWarning: `np.bool8` is a deprecated alias for `np.bool_`.  (Deprecated NumPy 1.24)
+  if not isinstance(done, (bool, np.bool8)):
+global_step=336, ep_r=[0.], ep_l=[43]
+global_step=416, ep_r=[2.], ep_l=[53]
+global_step=624, ep_r=[1.], ep_l=[79]
+global_step=632, ep_r=[0.], ep_l=[80]
+global_step=696, ep_r=[0.], ep_l=[88]
+global_step=848, ep_r=[0.], ep_l=[107]
+global_step=888, ep_r=[1.], ep_l=[59]
+global_step=920, ep_r=[0.], ep_l=[73]
+global_step=1112, ep_r=[1.], ep_l=[52]
+global_step=1216, ep_r=[8.], ep_l=[153]
+global_step=1224, ep_r=[0.], ep_l=[75]
+global_step=1224, ep_r=[0.], ep_l=[38]
+global_step=1272, ep_r=[0.], ep_l=[80]
+global_step=1312, ep_r=[1.], ep_l=[53]
+global_step=1448, ep_r=[2.], ep_l=[182]
+global_step=1536, ep_r=[1.], ep_l=[53]
+global_step=1568, ep_r=[0.], ep_l=[44]
+global_step=1624, ep_r=[1.], ep_l=[50]
+global_step=1736, ep_r=[0.], ep_l=[111]
+global_step=1744, ep_r=[2.], ep_l=[54]
+global_step=1800, ep_r=[0.], ep_l=[72]
+global_step=2032, ep_r=[3.], ep_l=[95]
+global_step=2040, ep_r=[0.], ep_l=[59]
+Traceback (most recent call last):
+  File "/home/x4nno/Documents/PhD/HOC/methods/HOC.py", line 581, in <module>
+    main_training_loop(agent, args, writer, envs, device)
+  File "/home/x4nno/Documents/PhD/HOC/methods/HOC.py", line 543, in main_training_loop
+    total_loss = agent.update_function(batch, args, writer, global_step_truth, envs)
+  File "/home/x4nno/Documents/PhD/HOC/OC_agents/HOC_agent.py", line 342, in update_function
+    option_logits = self.policys_over_options[b_meta_options](state_reps)
+TypeError: only integer tensors of a single element can be converted to an index

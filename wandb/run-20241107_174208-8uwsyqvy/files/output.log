@@ -1,0 +1,51 @@
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:174: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed a `seed` instead of using `Env.seed` for resetting the environment random number generator.
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:187: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed `options` to allow the environment initialisation to be passed additional information.
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:195: UserWarning: [33mWARN: The result returned by `env.reset()` was not a tuple of the form `(obs, info)`, where `obs` is a observation and `info` is a dictionary containing additional information. Actual type: `<class 'numpy.ndarray'>`
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:219: DeprecationWarning: [33mWARN: Core environment is written in old step API which returns one bool instead of two. It is recommended to rewrite the environment with new step API. 
+  logger.deprecation(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:225: DeprecationWarning: `np.bool8` is a deprecated alias for `np.bool_`.  (Deprecated NumPy 1.24)
+  if not isinstance(done, (bool, np.bool8)):
+global_step=416, ep_r=[0.], ep_l=[53]
+global_step=488, ep_r=[2.], ep_l=[62]
+global_step=592, ep_r=[1.], ep_l=[75]
+global_step=616, ep_r=[4.], ep_l=[78]
+global_step=624, ep_r=[1.], ep_l=[79]
+global_step=832, ep_r=[0.], ep_l=[105]
+global_step=1168, ep_r=[3.], ep_l=[72]
+global_step=1208, ep_r=[1.], ep_l=[99]
+global_step=1240, ep_r=[2.], ep_l=[94]
+global_step=1264, ep_r=[2.], ep_l=[159]
+global_step=1448, ep_r=[0.], ep_l=[103]
+global_step=1456, ep_r=[3.], ep_l=[105]
+global_step=1472, ep_r=[4.], ep_l=[185]
+global_step=1552, ep_r=[0.], ep_l=[90]
+global_step=1776, ep_r=[2.], ep_l=[76]
+global_step=1872, ep_r=[2.], ep_l=[76]
+global_step=1872, ep_r=[0.], ep_l=[83]
+Traceback (most recent call last):
+  File "/home/x4nno/Documents/PhD/HOC/methods/HOC.py", line 581, in <module>
+    main_training_loop(agent, args, writer, envs, device)
+  File "/home/x4nno/Documents/PhD/HOC/methods/HOC.py", line 543, in main_training_loop
+    total_loss = agent.update_function(batch, args, writer, global_step_truth, envs)
+  File "/home/x4nno/Documents/PhD/HOC/OC_agents/HOC_agent.py", line 343, in update_function
+    _, meta_option_logits = self.select_meta_option(state_reps, meta_options=b_meta_options)
+  File "/home/x4nno/Documents/PhD/HOC/OC_agents/HOC_agent.py", line 193, in select_meta_option
+    state_rep = self.forward_state_rep(state)
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/x4nno/Documents/PhD/HOC/OC_agents/HOC_agent.py", line 110, in forward
+    x = F.relu(self.conv1(state))
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 460, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 456, in _conv_forward
+    return F.conv2d(input, weight, bias, self.stride,
+RuntimeError: Expected 3D (unbatched) or 4D (batched) input to conv2d, but got input of size: [2048, 3136]
