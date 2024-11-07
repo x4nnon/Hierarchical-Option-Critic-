@@ -1,0 +1,108 @@
+{
+    "os": "Linux-6.9.3-76060903-generic-x86_64-with-glibc2.35",
+    "python": "3.10.14",
+    "heartbeatAt": "2024-11-05T18:10:48.350253",
+    "startedAt": "2024-11-05T18:10:47.099816",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/home/x4nno/Documents/PhD/PPOC/methods/OC_PPO.py",
+    "codePathLocal": "methods/OC_PPO.py",
+    "codePath": "methods/OC_PPO.py",
+    "git": {
+        "remote": "https://github.com/x4nnon/PPOC.git",
+        "commit": "00f4abdbc57d5eabfbce5f39e247a465cd3dda4a"
+    },
+    "email": "x4nnon@gmail.com",
+    "root": "/home/x4nno/Documents/PhD/PPOC",
+    "host": "pop-os",
+    "username": "x4nno",
+    "executable": "/home/x4nno/anaconda3/envs/fracos_ppo/bin/python",
+    "cpu_count": 6,
+    "cpu_count_logical": 12,
+    "cpu_freq": {
+        "current": 2493.9675833333336,
+        "min": 800.0,
+        "max": 4500.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 3999.73,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 4050.127,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 4097.754,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 4098.158,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 4000.921,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 4099.038,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 4092.713,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 800.0,
+            "min": 800.0,
+            "max": 4500.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 225.31660079956055,
+            "used": 212.2697296142578
+        }
+    },
+    "gpu": "NVIDIA GeForce RTX 2070 with Max-Q Design",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 2070 with Max-Q Design",
+            "memory_total": 8589934592
+        }
+    ],
+    "memory": {
+        "total": 15.513446807861328
+    }
+}

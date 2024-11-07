@@ -1,0 +1,157 @@
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/envs/registration.py:563: UserWarning: [33mWARN: Using the latest versioned environment `procgen-bigfish-v0` instead of the unversioned environment `procgen-bigfish`.
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:174: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed a `seed` instead of using `Env.seed` for resetting the environment random number generator.
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:187: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed `options` to allow the environment initialisation to be passed additional information.
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:195: UserWarning: [33mWARN: The result returned by `env.reset()` was not a tuple of the form `(obs, info)`, where `obs` is a observation and `info` is a dictionary containing additional information. Actual type: `<class 'numpy.ndarray'>`
+  logger.warn(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:219: DeprecationWarning: [33mWARN: Core environment is written in old step API which returns one bool instead of two. It is recommended to rewrite the environment with new step API. 
+  logger.deprecation(
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/utils/passive_env_checker.py:225: DeprecationWarning: `np.bool8` is a deprecated alias for `np.bool_`.  (Deprecated NumPy 1.24)
+  if not isinstance(done, (bool, np.bool8)):
+global_step=648, ep_r=[0.], ep_l=[82]
+global_step=1544, ep_r=[2.], ep_l=[194]
+global_step=1552, ep_r=[1.], ep_l=[195]
+global_step=1608, ep_r=[1.], ep_l=[202]
+global_step=1672, ep_r=[1.], ep_l=[210]
+global_step=1696, ep_r=[2.], ep_l=[213]
+global_step=1912, ep_r=[4.], ep_l=[240]
+global_step=1928, ep_r=[0.], ep_l=[48]
+SPS: 310
+Time taken:  1.3261175155639648
+global_step=2200, ep_r=[0.], ep_l=[65]
+global_step=2312, ep_r=[0.], ep_l=[47]
+global_step=2560, ep_r=[4.], ep_l=[320]
+global_step=2568, ep_r=[0.], ep_l=[46]
+global_step=2728, ep_r=[2.], ep_l=[259]
+global_step=2856, ep_r=[1.], ep_l=[68]
+global_step=3000, ep_r=[0.], ep_l=[55]
+global_step=3064, ep_r=[1.], ep_l=[62]
+global_step=3104, ep_r=[0.], ep_l=[47]
+global_step=3400, ep_r=[0.], ep_l=[50]
+global_step=3576, ep_r=[0.], ep_l=[90]
+global_step=3632, ep_r=[0.], ep_l=[66]
+global_step=3688, ep_r=[1.], ep_l=[259]
+global_step=3736, ep_r=[1.], ep_l=[254]
+global_step=3800, ep_r=[0.], ep_l=[92]
+global_step=3848, ep_r=[0.], ep_l=[56]
+global_step=4040, ep_r=[0.], ep_l=[44]
+global_step=4056, ep_r=[2.], ep_l=[312]
+SPS: 352
+Time taken:  0.9244515895843506
+global_step=4128, ep_r=[0.], ep_l=[48]
+global_step=4416, ep_r=[0.], ep_l=[97]
+global_step=4480, ep_r=[2.], ep_l=[319]
+global_step=4480, ep_r=[0.], ep_l=[52]
+global_step=4552, ep_r=[0.], ep_l=[87]
+global_step=4608, ep_r=[0.], ep_l=[70]
+global_step=4616, ep_r=[0.], ep_l=[61]
+global_step=4832, ep_r=[0.], ep_l=[44]
+global_step=4992, ep_r=[0.], ep_l=[64]
+global_step=5264, ep_r=[0.], ep_l=[54]
+global_step=5384, ep_r=[0.], ep_l=[96]
+global_step=5432, ep_r=[2.], ep_l=[231]
+global_step=5528, ep_r=[0.], ep_l=[115]
+global_step=5680, ep_r=[0.], ep_l=[86]
+global_step=5840, ep_r=[2.], ep_l=[254]
+global_step=6048, ep_r=[0.], ep_l=[98]
+SPS: 367
+Time taken:  0.9755868911743164
+global_step=6232, ep_r=[2.], ep_l=[99]
+global_step=6296, ep_r=[4.], ep_l=[234]
+global_step=6344, ep_r=[3.], ep_l=[223]
+global_step=6440, ep_r=[0.], ep_l=[74]
+global_step=6896, ep_r=[0.], ep_l=[69]
+global_step=6920, ep_r=[0.], ep_l=[78]
+global_step=7168, ep_r=[1.], ep_l=[117]
+global_step=7352, ep_r=[1.], ep_l=[114]
+global_step=7424, ep_r=[3.], ep_l=[217]
+global_step=7432, ep_r=[7.], ep_l=[255]
+global_step=7456, ep_r=[2.], ep_l=[175]
+global_step=7784, ep_r=[0.], ep_l=[111]
+global_step=7816, ep_r=[0.], ep_l=[58]
+global_step=7976, ep_r=[0.], ep_l=[65]
+global_step=8016, ep_r=[0.], ep_l=[137]
+global_step=8064, ep_r=[1.], ep_l=[80]
+SPS: 389
+Time taken:  0.786362886428833
+global_step=8288, ep_r=[2.], ep_l=[106]
+global_step=8464, ep_r=[0.], ep_l=[55]
+global_step=8864, ep_r=[1.], ep_l=[415]
+global_step=8872, ep_r=[1.], ep_l=[135]
+global_step=8936, ep_r=[1.], ep_l=[119]
+global_step=9112, ep_r=[1.], ep_l=[161]
+global_step=9200, ep_r=[0.], ep_l=[41]
+global_step=9296, ep_r=[2.], ep_l=[265]
+global_step=9312, ep_r=[0.], ep_l=[47]
+global_step=9456, ep_r=[0.], ep_l=[74]
+global_step=9480, ep_r=[2.], ep_l=[127]
+global_step=9848, ep_r=[0.], ep_l=[81]
+global_step=10104, ep_r=[0.], ep_l=[32]
+SPS: 403
+Time taken:  0.9719769954681396
+global_step=10336, ep_r=[0.], ep_l=[106]
+global_step=10400, ep_r=[1.], ep_l=[117]
+global_step=10416, ep_r=[1.], ep_l=[292]
+global_step=10424, ep_r=[0.], ep_l=[140]
+global_step=10616, ep_r=[3.], ep_l=[290]
+global_step=10624, ep_r=[1.], ep_l=[64]
+global_step=10648, ep_r=[0.], ep_l=[39]
+global_step=10808, ep_r=[3.], ep_l=[186]
+global_step=10840, ep_r=[0.], ep_l=[53]
+global_step=11032, ep_r=[0.], ep_l=[52]
+global_step=11216, ep_r=[0.], ep_l=[71]
+global_step=11504, ep_r=[1.], ep_l=[138]
+global_step=11536, ep_r=[0.], ep_l=[91]
+global_step=11768, ep_r=[0.], ep_l=[33]
+global_step=11784, ep_r=[0.], ep_l=[31]
+global_step=11840, ep_r=[1.], ep_l=[340]
+global_step=11992, ep_r=[4.], ep_l=[171]
+global_step=12128, ep_r=[0.], ep_l=[114]
+global_step=12144, ep_r=[0.], ep_l=[38]
+global_step=12200, ep_r=[1.], ep_l=[146]
+global_step=12272, ep_r=[0.], ep_l=[61]
+SPS: 398
+Time taken:  0.7792685031890869
+global_step=12384, ep_r=[0.], ep_l=[48]
+global_step=12576, ep_r=[1.], ep_l=[55]
+global_step=12608, ep_r=[2.], ep_l=[272]
+global_step=12688, ep_r=[0.], ep_l=[67]
+global_step=12704, ep_r=[1.], ep_l=[116]
+global_step=12944, ep_r=[1.], ep_l=[42]
+global_step=12976, ep_r=[0.], ep_l=[34]
+global_step=13344, ep_r=[0.], ep_l=[50]
+global_step=13368, ep_r=[5.], ep_l=[315]
+global_step=13400, ep_r=[2.], ep_l=[127]
+global_step=13400, ep_r=[2.], ep_l=[103]
+global_step=13472, ep_r=[0.], ep_l=[62]
+global_step=13504, ep_r=[0.], ep_l=[162]
+global_step=13712, ep_r=[0.], ep_l=[43]
+global_step=13824, ep_r=[0.], ep_l=[40]
+global_step=13856, ep_r=[0.], ep_l=[57]
+global_step=14024, ep_r=[0.], ep_l=[78]
+global_step=14024, ep_r=[0.], ep_l=[39]
+global_step=14120, ep_r=[3.], ep_l=[230]
+global_step=14304, ep_r=[1.], ep_l=[120]
+global_step=14360, ep_r=[2.], ep_l=[209]
+Traceback (most recent call last):
+  File "/home/x4nno/Documents/PhD/PPOC/methods/OC_PPO.py", line 757, in <module>
+    oc(args)
+  File "/home/x4nno/Documents/PhD/PPOC/methods/OC_PPO.py", line 643, in oc
+    update_state_rep = agent.state_representation(b_obs[mb_inds].permute(0, 3, 1, 2)/255)
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/x4nno/Documents/PhD/FRACOs_a/OC_agents/OC_PPO_agent.py", line 146, in forward
+    x = F.relu(self.conv2(x))
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 460, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 456, in _conv_forward
+    return F.conv2d(input, weight, bias, self.stride,
+KeyboardInterrupt

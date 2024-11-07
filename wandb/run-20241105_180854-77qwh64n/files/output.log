@@ -1,0 +1,16 @@
+/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/gym/envs/registration.py:563: UserWarning: [33mWARN: Using the latest versioned environment `procgen-bigfish-v0` instead of the unversioned environment `procgen-bigfish`.
+  logger.warn(
+Traceback (most recent call last):
+  File "/home/x4nno/Documents/PhD/PPOC/methods/OC_PPO.py", line 757, in <module>
+    oc(args)
+  File "/home/x4nno/Documents/PhD/PPOC/methods/OC_PPO.py", line 456, in oc
+    agent.load(load_path, exclude_meta=True)
+  File "/home/x4nno/Documents/PhD/FRACOs_a/OC_agents/OC_PPO_agent.py", line 419, in load
+    self.state_representation.load_state_dict(torch.load(os.path.join(load_path, 'state_representation.pth')))
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/serialization.py", line 997, in load
+    with _open_file_like(f, 'rb') as opened_file:
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/serialization.py", line 444, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/home/x4nno/anaconda3/envs/fracos_ppo/lib/python3.10/site-packages/torch/serialization.py", line 425, in __init__
+    super().__init__(open(name, mode))
+FileNotFoundError: [Errno 2] No such file or directory: 'OC_policies/procgen-bigfish/state_representation.pth'
