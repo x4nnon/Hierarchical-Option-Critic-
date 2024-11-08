@@ -1,0 +1,47 @@
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/envs/registration.py:563: UserWarning: [33mWARN: Using the latest versioned environment `procgen-starpilot-v0` instead of the unversioned environment `procgen-starpilot`.
+  logger.warn(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:174: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed a `seed` instead of using `Env.seed` for resetting the environment random number generator.
+  logger.warn(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:187: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed `options` to allow the environment initialisation to be passed additional information.
+  logger.warn(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:195: UserWarning: [33mWARN: The result returned by `env.reset()` was not a tuple of the form `(obs, info)`, where `obs` is a observation and `info` is a dictionary containing additional information. Actual type: `<class 'numpy.ndarray'>`
+  logger.warn(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:219: DeprecationWarning: [33mWARN: Core environment is written in old step API which returns one bool instead of two. It is recommended to rewrite the environment with new step API. 
+  logger.deprecation(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:225: DeprecationWarning: `np.bool8` is a deprecated alias for `np.bool_`.  (Deprecated NumPy 1.24)
+  if not isinstance(done, (bool, np.bool8)):
+global_step=424, ep_r=[0.], ep_l=[54]
+global_step=440, ep_r=[1.], ep_l=[56]
+global_step=448, ep_r=[0.], ep_l=[57]
+global_step=456, ep_r=[0.], ep_l=[58]
+global_step=456, ep_r=[0.], ep_l=[58]
+global_step=512, ep_r=[1.], ep_l=[65]
+global_step=632, ep_r=[0.], ep_l=[80]
+global_step=904, ep_r=[6.], ep_l=[60]
+global_step=944, ep_r=[1.], ep_l=[61]
+global_step=1024, ep_r=[5.], ep_l=[73]
+global_step=1064, ep_r=[0.], ep_l=[54]
+global_step=1064, ep_r=[2.], ep_l=[69]
+global_step=1096, ep_r=[4.], ep_l=[81]
+global_step=1120, ep_r=[5.], ep_l=[83]
+global_step=1256, ep_r=[6.], ep_l=[158]
+global_step=1512, ep_r=[1.], ep_l=[71]
+global_step=1552, ep_r=[1.], ep_l=[81]
+global_step=1592, ep_r=[0.], ep_l=[66]
+Traceback (most recent call last):
+  File "/home/x4nno_desktop/Documents/HOC/methods/HOC_PPO.py", line 786, in <module>
+    hoc(args)
+  File "/home/x4nno_desktop/Documents/HOC/methods/HOC_PPO.py", line 675, in hoc
+    m_clipfracs += [((m_ratio - 1.0).abs() > args.clip_coef).float().mean().item()]
+UnboundLocalError: local variable 'm_clipfracs' referenced before assignment
+Traceback (most recent call last):
+  File "/home/x4nno_desktop/Documents/HOC/methods/HOC_PPO.py", line 786, in <module>
+    hoc(args)
+  File "/home/x4nno_desktop/Documents/HOC/methods/HOC_PPO.py", line 675, in hoc
+    m_clipfracs += [((m_ratio - 1.0).abs() > args.clip_coef).float().mean().item()]
+UnboundLocalError: local variable 'm_clipfracs' referenced before assignment
+global_step=1656, ep_r=[0.], ep_l=[70]
+global_step=1784, ep_r=[0.], ep_l=[66]
+global_step=1824, ep_r=[1.], ep_l=[88]
+global_step=1976, ep_r=[1.], ep_l=[114]
+global_step=1984, ep_r=[1.], ep_l=[120]

@@ -1,0 +1,330 @@
+diff --git a/OC_agents/HOC_agent.py b/OC_agents/HOC_agent.py
+index 89cc23e..ba6f975 100644
+--- a/OC_agents/HOC_agent.py
++++ b/OC_agents/HOC_agent.py
+@@ -318,7 +318,7 @@ class HOCAgent(nn.Module):
+             if mask.sum() > 0:
+                 termination_prob = self.meta_termination[i](state_rep[mask])
+                 termination_prob = torch.sigmoid(termination_prob)
+-                termination_probs[mask] = termination_prob
++                termination_probs[mask] = termination_prob.squeeze()
+         return termination_probs
+ 
+     def termination_function_option(self, state, option):
+@@ -376,65 +376,97 @@ class HOCAgent(nn.Module):
+ 
+         if b_states.shape[-1] == 3:
+             b_states = b_states.permute(0, 3, 1, 2)
+-        # Compute the current state representation
+-        # state_reps = self.forward_state_rep(b_states)
+-
+-        # Use pre-computed Q-values from the buffer
+-        q_action_values = b_values
+-        q_option_values = b_option_values
+-        q_meta_values = b_meta_option_values
+-
+-        # Compute returns and advantages using GAE
+-        meta_advantages, meta_returns = self.compute_advantages(
+-            b_rewards, q_meta_values, b_dones, args.gamma, args.gae_lambda
+-        )
+-        option_advantages, option_returns = self.compute_advantages(
+-            b_rewards, q_option_values, b_dones, args.gamma, args.gae_lambda
+-        )
+-        action_advantages, action_returns = self.compute_advantages(
+-            b_rewards, q_action_values, b_dones, args.gamma, args.gae_lambda
+-        )
+-
+-        # Compute policy losses for meta-options
+-        _, meta_option_logits = self.select_meta_option(b_states, meta_options=b_meta_options)
+-        meta_option_probs = Categorical(logits=meta_option_logits)
+-        meta_log_probs = meta_option_probs.log_prob(b_meta_options) 
+-        meta_policy_loss = -(meta_log_probs * meta_advantages).mean()
+-        meta_entropy = meta_option_probs.entropy().mean()
+-        meta_policy_loss -= args.meta_ent_coef * meta_entropy
+-
+-        # Compute policy losses for options
+-        _, option_logits = self.select_option(b_states, b_meta_options, options=b_options)
+-        option_probs = Categorical(logits=option_logits)
+-        option_log_probs = option_probs.log_prob(b_options)
+-        option_policy_loss = -(option_log_probs * option_advantages).mean()
+-        option_entropy = option_probs.entropy().mean()
+-        option_policy_loss -= args.option_ent_coef * option_entropy
+-
+-        # Compute action policy losses
+-        _, action_logits = self.select_action(b_states, b_options, actions=b_actions)
+-        action_probs = Categorical(logits=action_logits)
+-        action_log_probs = action_probs.log_prob(b_actions)
+-        action_policy_loss = -(action_log_probs * action_advantages).mean()
+-        action_entropy = action_probs.entropy().mean()
+-        action_policy_loss -= args.action_ent_coef * action_entropy
+-
+-        # Compute termination losses
+-        termination_probs_meta = self.termination_function_meta(b_states, b_meta_options)
+-        termination_loss_meta = -(meta_advantages * (1 - termination_probs_meta)).mean()
+-
+-        termination_probs_option = self.termination_function_option(b_states, b_options)
+-        termination_loss_option = -(option_advantages * (1 - termination_probs_option)).mean()
+-
+-        # Compute critic losses
+-        critic_loss_meta = 0.5 * ((q_meta_values - meta_returns) ** 2).mean()
+-        critic_loss_option = 0.5 * ((q_option_values - option_returns) ** 2).mean()
+-        critic_loss_action = 0.5 * ((q_action_values - action_returns) ** 2).mean()
+-
+-        # Total loss
+-        total_loss = meta_policy_loss + option_policy_loss + action_policy_loss + \
+-                    termination_loss_meta + termination_loss_option + \
+-                    critic_loss_meta + critic_loss_option + critic_loss_action
++
++        # Define mini-batch size
++        num_samples = b_states.size(0)
++        num_batches = args.num_minibatches
++        mini_batch_size = num_samples // num_batches
++
++        total_loss = 0
++
++        for i in range(num_batches):
++            start_idx = i * mini_batch_size
++            end_idx = start_idx + mini_batch_size
++
++            # Extract mini-batch
++            mb_states = b_states[start_idx:end_idx]
++            mb_actions = b_actions[start_idx:end_idx]
++            mb_options = b_options[start_idx:end_idx]
++            mb_meta_options = b_meta_options[start_idx:end_idx]
++            mb_rewards = b_rewards[start_idx:end_idx]
++            mb_option_values = b_option_values[start_idx:end_idx]
++            mb_meta_option_values = b_meta_option_values[start_idx:end_idx]
++            mb_values = b_values[start_idx:end_idx]
++            mb_dones = b_dones[start_idx:end_idx]
++
++            # Use pre-computed Q-values from the buffer
++            q_action_values = mb_values
++            q_option_values = mb_option_values
++            q_meta_values = mb_meta_option_values
++
++            # Compute returns and advantages using GAE
++            meta_advantages, meta_returns = self.compute_advantages(
++                mb_rewards, q_meta_values, mb_dones, args.gamma, args.gae_lambda
++            )
++            option_advantages, option_returns = self.compute_advantages(
++                mb_rewards, q_option_values, mb_dones, args.gamma, args.gae_lambda
++            )
++            action_advantages, action_returns = self.compute_advantages(
++                mb_rewards, q_action_values, mb_dones, args.gamma, args.gae_lambda
++            )
++
++            # Compute policy losses for meta-options
++            _, meta_option_logits = self.select_meta_option(mb_states, meta_options=mb_meta_options)
++            meta_option_probs = Categorical(logits=meta_option_logits)
++            meta_log_probs = meta_option_probs.log_prob(mb_meta_options) 
++            meta_policy_loss = -(meta_log_probs * meta_advantages).mean()
++            meta_entropy = meta_option_probs.entropy().mean()
++            meta_policy_loss -= args.meta_ent_coef * meta_entropy
++
++            # Compute policy losses for options
++            _, option_logits = self.select_option(mb_states, mb_meta_options, options=mb_options)
++            option_probs = Categorical(logits=option_logits)
++            option_log_probs = option_probs.log_prob(mb_options)
++            option_policy_loss = -(option_log_probs * option_advantages).mean()
++            option_entropy = option_probs.entropy().mean()
++            option_policy_loss -= args.option_ent_coef * option_entropy
++
++            # Compute action policy losses
++            _, action_logits = self.select_action(mb_states, mb_options, actions=mb_actions)
++            action_probs = Categorical(logits=action_logits)
++            action_log_probs = action_probs.log_prob(mb_actions)
++            action_policy_loss = -(action_log_probs * action_advantages).mean()
++            action_entropy = action_probs.entropy().mean()
++            action_policy_loss -= args.action_ent_coef * action_entropy
++
++            # Compute termination losses
++            termination_probs_meta = self.termination_function_meta(mb_states, mb_meta_options)
++            termination_loss_meta = -(meta_advantages * (1 - termination_probs_meta)).mean()
++
++            termination_probs_option = self.termination_function_option(mb_states, mb_options)
++            termination_loss_option = -(option_advantages * (1 - termination_probs_option)).mean()
++
++            # Compute critic losses
++            critic_loss_meta = 0.5 * ((q_meta_values - meta_returns) ** 2).mean()
++            critic_loss_option = 0.5 * ((q_option_values - option_returns) ** 2).mean()
++            critic_loss_action = 0.5 * ((q_action_values - action_returns) ** 2).mean()
++
++            # Total loss for the mini-batch
++            mini_batch_loss = meta_policy_loss + option_policy_loss + action_policy_loss + \
++                              termination_loss_meta + termination_loss_option + \
++                              critic_loss_meta + critic_loss_option + critic_loss_action
++
++            # Accumulate total loss
++            total_loss += mini_batch_loss.item()
++
++            # Backward pass for the mini-batch
++            self.optimizer.zero_grad()
++            mini_batch_loss.backward()
++            torch.nn.utils.clip_grad_norm_(self.all_params, args.max_grad_norm)
++            self.optimizer.step()
++
++        # Average total loss over all mini-batches
++        total_loss /= num_batches
+ 
+         # Logging
+         writer.add_scalar("losses/total_loss", total_loss, global_step_truth)
+@@ -448,12 +480,6 @@ class HOCAgent(nn.Module):
+         writer.add_scalar("losses/critic_loss_option", critic_loss_option, global_step_truth)
+         writer.add_scalar("losses/critic_loss_action", critic_loss_action, global_step_truth)
+ 
+-        # Backward pass
+-        self.optimizer.zero_grad()
+-        total_loss.backward()
+-        torch.nn.utils.clip_grad_norm_(self.all_params, args.max_grad_norm)
+-        self.optimizer.step()
+-
+         return total_loss
+ 
+     def compute_advantages(self, rewards, values, dones, gamma, gae_lambda, next_value=0):
+diff --git a/OC_agents/__pycache__/HOC_agent.cpython-39.pyc b/OC_agents/__pycache__/HOC_agent.cpython-39.pyc
+index 435cc8d..f8a1fb2 100644
+Binary files a/OC_agents/__pycache__/HOC_agent.cpython-39.pyc and b/OC_agents/__pycache__/HOC_agent.cpython-39.pyc differ
+diff --git a/methods/HOC.py b/methods/HOC.py
+index b35b5c1..774a4df 100644
+--- a/methods/HOC.py
++++ b/methods/HOC.py
+@@ -70,7 +70,7 @@ class Args:
+     num_steps: int = 256
+     anneal_lr: bool = True
+     gamma: float = 0.999
+-    num_minibatches: int = 1
++    num_minibatches: int = 4
+     update_epochs: int = 4
+     report_epoch: int = 81920
+     anneal_ent: bool = True
+diff --git a/wandb/debug-cli.x4nno_desktop.log b/wandb/debug-cli.x4nno_desktop.log
+index 1239b33..a50c274 100644
+--- a/wandb/debug-cli.x4nno_desktop.log
++++ b/wandb/debug-cli.x4nno_desktop.log
+@@ -37422,3 +37422,99 @@
+ 2024-11-08 11:07:21 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 11:07:09.002212/events.out.tfevents.1731064036.pop-os.3576755.0
+ 2024-11-08 11:07:22 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 11:07:09.002212/events.out.tfevents.1731064036.pop-os.3576755.0
+ 2024-11-08 11:07:23 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 11:07:09.002212/events.out.tfevents.1731064036.pop-os.3576755.0
++2024-11-08 12:23:19 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:19 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:19 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:20 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:21 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:22 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:23 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:24 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:25 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:24:38 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:24:29.739009/events.out.tfevents.1731068677.pop-os.3580575.0
++2024-11-08 12:24:39 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:24:29.739009/events.out.tfevents.1731068677.pop-os.3580575.0
++2024-11-08 12:24:40 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:24:29.739009/events.out.tfevents.1731068677.pop-os.3580575.0
++2024-11-08 12:24:41 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:24:29.739009/events.out.tfevents.1731068677.pop-os.3580575.0
++2024-11-08 12:24:42 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:24:29.739009/events.out.tfevents.1731068677.pop-os.3580575.0
++2024-11-08 12:24:42 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:24:29.739009/events.out.tfevents.1731068677.pop-os.3580575.0
++2024-11-08 12:24:42 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:24:29.739009/events.out.tfevents.1731068677.pop-os.3580575.0
++2024-11-08 12:24:43 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:24:29.739009/events.out.tfevents.1731068677.pop-os.3580575.0
++2024-11-08 12:24:44 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:24:29.739009/events.out.tfevents.1731068677.pop-os.3580575.0
++2024-11-08 12:24:45 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:24:29.739009/events.out.tfevents.1731068677.pop-os.3580575.0
++2024-11-08 12:24:46 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:24:29.739009/events.out.tfevents.1731068677.pop-os.3580575.0
++2024-11-08 12:24:47 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:24:29.739009/events.out.tfevents.1731068677.pop-os.3580575.0
++2024-11-08 12:39:20 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:39:11.852357/events.out.tfevents.1731069559.pop-os.3582430.0
++2024-11-08 12:39:21 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:39:11.852357/events.out.tfevents.1731069559.pop-os.3582430.0
++2024-11-08 12:39:22 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:39:11.852357/events.out.tfevents.1731069559.pop-os.3582430.0
++2024-11-08 12:39:23 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:39:11.852357/events.out.tfevents.1731069559.pop-os.3582430.0
++2024-11-08 12:39:23 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:39:11.852357/events.out.tfevents.1731069559.pop-os.3582430.0
++2024-11-08 12:39:23 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:39:11.852357/events.out.tfevents.1731069559.pop-os.3582430.0
++2024-11-08 12:39:24 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:39:11.852357/events.out.tfevents.1731069559.pop-os.3582430.0
++2024-11-08 12:39:25 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:39:11.852357/events.out.tfevents.1731069559.pop-os.3582430.0
++2024-11-08 12:39:26 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:39:11.852357/events.out.tfevents.1731069559.pop-os.3582430.0
++2024-11-08 12:39:27 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:39:11.852357/events.out.tfevents.1731069559.pop-os.3582430.0
++2024-11-08 12:39:28 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:39:11.852357/events.out.tfevents.1731069559.pop-os.3582430.0
++2024-11-08 12:41:54 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:41:55 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:41:56 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:41:57 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:41:58 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:41:59 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:00 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:01 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:02 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:03 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:04 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:05 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:06 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:07 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:08 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:09 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:10 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:11 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:12 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:13 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:14 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:15 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:16 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:17 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:18 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:19 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:20 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:21 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:22 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:23 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:24 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:25 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:26 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:27 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:28 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:29 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:30 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:31 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:32 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:33 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:34 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:35 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:36 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:37 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:38 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:39 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:40 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:41 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:42 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:43 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:44 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:45 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:46 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:47 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:48 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:49 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:50 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:50 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:50 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:51 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:52 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:53 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:54 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
++2024-11-08 12:42:55 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:41:45.436035/events.out.tfevents.1731069712.pop-os.3583048.0
+diff --git a/wandb/debug-internal.log b/wandb/debug-internal.log
+index fa9cf83..1042dc4 120000
+--- a/wandb/debug-internal.log
++++ b/wandb/debug-internal.log
+@@ -1 +1 @@
+-run-20241108_110711-ek61pkfc/logs/debug-internal.log
+\ No newline at end of file
++run-20241108_125519-upfktyfm/logs/debug-internal.log
+\ No newline at end of file
+diff --git a/wandb/debug.log b/wandb/debug.log
+index 5ee471b..2e3e633 120000
+--- a/wandb/debug.log
++++ b/wandb/debug.log
+@@ -1 +1 @@
+-run-20241108_110711-ek61pkfc/logs/debug.log
+\ No newline at end of file
++run-20241108_125519-upfktyfm/logs/debug.log
+\ No newline at end of file
+diff --git a/wandb/latest-run b/wandb/latest-run
+index a437700..058fddf 120000
+--- a/wandb/latest-run
++++ b/wandb/latest-run
+@@ -1 +1 @@
+-run-20241108_110711-ek61pkfc
+\ No newline at end of file
++run-20241108_125519-upfktyfm
+\ No newline at end of file

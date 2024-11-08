@@ -1,0 +1,60 @@
+diff --git a/OC_agents/HOC_agent.py b/OC_agents/HOC_agent.py
+index 89cc23e..59fb20a 100644
+--- a/OC_agents/HOC_agent.py
++++ b/OC_agents/HOC_agent.py
+@@ -318,7 +318,7 @@ class HOCAgent(nn.Module):
+             if mask.sum() > 0:
+                 termination_prob = self.meta_termination[i](state_rep[mask])
+                 termination_prob = torch.sigmoid(termination_prob)
+-                termination_probs[mask] = termination_prob
++                termination_probs[mask] = termination_prob.squeeze()
+         return termination_probs
+ 
+     def termination_function_option(self, state, option):
+diff --git a/OC_agents/__pycache__/HOC_agent.cpython-39.pyc b/OC_agents/__pycache__/HOC_agent.cpython-39.pyc
+index 435cc8d..84a2c88 100644
+Binary files a/OC_agents/__pycache__/HOC_agent.cpython-39.pyc and b/OC_agents/__pycache__/HOC_agent.cpython-39.pyc differ
+diff --git a/wandb/debug-cli.x4nno_desktop.log b/wandb/debug-cli.x4nno_desktop.log
+index 1239b33..e8af1dc 100644
+--- a/wandb/debug-cli.x4nno_desktop.log
++++ b/wandb/debug-cli.x4nno_desktop.log
+@@ -37422,3 +37422,12 @@
+ 2024-11-08 11:07:21 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 11:07:09.002212/events.out.tfevents.1731064036.pop-os.3576755.0
+ 2024-11-08 11:07:22 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 11:07:09.002212/events.out.tfevents.1731064036.pop-os.3576755.0
+ 2024-11-08 11:07:23 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 11:07:09.002212/events.out.tfevents.1731064036.pop-os.3576755.0
++2024-11-08 12:23:19 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:19 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:19 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:20 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:21 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:22 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:23 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:24 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
++2024-11-08 12:23:25 INFO No path found after runs/HOC_procgen-starpilot__0__2024-11-08 12:23:10.752253/events.out.tfevents.1731068598.pop-os.3580110.0
+diff --git a/wandb/debug-internal.log b/wandb/debug-internal.log
+index fa9cf83..67b4777 120000
+--- a/wandb/debug-internal.log
++++ b/wandb/debug-internal.log
+@@ -1 +1 @@
+-run-20241108_110711-ek61pkfc/logs/debug-internal.log
+\ No newline at end of file
++run-20241108_122432-fyfewgfd/logs/debug-internal.log
+\ No newline at end of file
+diff --git a/wandb/debug.log b/wandb/debug.log
+index 5ee471b..e1acdec 120000
+--- a/wandb/debug.log
++++ b/wandb/debug.log
+@@ -1 +1 @@
+-run-20241108_110711-ek61pkfc/logs/debug.log
+\ No newline at end of file
++run-20241108_122432-fyfewgfd/logs/debug.log
+\ No newline at end of file
+diff --git a/wandb/latest-run b/wandb/latest-run
+index a437700..16bebb2 120000
+--- a/wandb/latest-run
++++ b/wandb/latest-run
+@@ -1 +1 @@
+-run-20241108_110711-ek61pkfc
+\ No newline at end of file
++run-20241108_122432-fyfewgfd
+\ No newline at end of file

@@ -194,10 +194,10 @@ class HOCAgent(nn.Module):
         self.option_critic = layer_init(nn.Linear(256, num_options), std=0.1).to(device)
         # Critic for meta-option-value estimation
         self.meta_critic = layer_init(nn.Linear(256, num_meta_options), std=0.1).to(device)
-        #critic over actions
+        # Critic over actions
         self.critic_over_actions = layer_init(nn.Linear(256, num_actions), std=0.1).to(device)
-        #shared state representation
 
+        # Shared state representation
         h, w, c = envs.single_observation_space.shape
         shape = (c, h, w)
         conv_seqs = []
@@ -217,24 +217,19 @@ class HOCAgent(nn.Module):
         self.option_termination = [layer_init(nn.Linear(256, 1), std=1).to(device) for _ in range(num_options)]
         self.meta_termination = [layer_init(nn.Linear(256, 1), std=1).to(device) for _ in range(num_meta_options)]
 
-        # I think ... check this in the debugger.
-        all_policy_over_options_params = [list(self.policys_over_options[i].parameters()) for i in range(num_meta_options)]
-        all_actors_policy_params = [list(self.actors_policy[i].parameters()) for i in range(num_options)]
-        all_option_termination_params = [list(self.option_termination[i].parameters()) for i in range(num_options)]
-        all_meta_termination_params = [list(self.meta_termination[i].parameters()) for i in range(num_meta_options)]
-
         # Collect all parameters for joint optimization
         self.all_params = list(self.meta_option_policy.parameters()) + list(self.option_critic.parameters()) \
-                          + list(self.meta_critic.parameters())
+                          + list(self.meta_critic.parameters()) + list(self.critic_over_actions.parameters()) \
+                          + list(self.forward_state_rep.parameters())
         
-        for param in all_policy_over_options_params:
-            self.all_params.extend(param)
-        for param in all_actors_policy_params:
-            self.all_params.extend(param)
-        for param in all_option_termination_params:
-            self.all_params.extend(param)
-        for param in all_meta_termination_params:
-            self.all_params.extend(param)
+        for param in self.policys_over_options:
+            self.all_params.extend(param.parameters())
+        for param in self.actors_policy:
+            self.all_params.extend(param.parameters())
+        for param in self.option_termination:
+            self.all_params.extend(param.parameters())
+        for param in self.meta_termination:
+            self.all_params.extend(param.parameters())
 
         self.optimizer = optim.Adam(self.all_params, lr=learning_rate)
                 
@@ -318,7 +313,7 @@ class HOCAgent(nn.Module):
             if mask.sum() > 0:
                 termination_prob = self.meta_termination[i](state_rep[mask])
                 termination_prob = torch.sigmoid(termination_prob)
-                termination_probs[mask] = termination_prob
+                termination_probs[mask] = termination_prob.squeeze()
         return termination_probs
 
     def termination_function_option(self, state, option):
@@ -376,65 +371,97 @@ class HOCAgent(nn.Module):
 
         if b_states.shape[-1] == 3:
             b_states = b_states.permute(0, 3, 1, 2)
-        # Compute the current state representation
-        # state_reps = self.forward_state_rep(b_states)
 
-        # Use pre-computed Q-values from the buffer
-        q_action_values = b_values
-        q_option_values = b_option_values
-        q_meta_values = b_meta_option_values
+        # Define mini-batch size
+        num_samples = b_states.size(0)
+        num_batches = args.num_minibatches
+        mini_batch_size = num_samples // num_batches
 
-        # Compute returns and advantages using GAE
-        meta_advantages, meta_returns = self.compute_advantages(
-            b_rewards, q_meta_values, b_dones, args.gamma, args.gae_lambda
-        )
-        option_advantages, option_returns = self.compute_advantages(
-            b_rewards, q_option_values, b_dones, args.gamma, args.gae_lambda
-        )
-        action_advantages, action_returns = self.compute_advantages(
-            b_rewards, q_action_values, b_dones, args.gamma, args.gae_lambda
-        )
+        total_loss = 0
 
-        # Compute policy losses for meta-options
-        _, meta_option_logits = self.select_meta_option(b_states, meta_options=b_meta_options)
-        meta_option_probs = Categorical(logits=meta_option_logits)
-        meta_log_probs = meta_option_probs.log_prob(b_meta_options) 
-        meta_policy_loss = -(meta_log_probs * meta_advantages).mean()
-        meta_entropy = meta_option_probs.entropy().mean()
-        meta_policy_loss -= args.meta_ent_coef * meta_entropy
+        for i in range(num_batches):
+            start_idx = i * mini_batch_size
+            end_idx = start_idx + mini_batch_size
 
-        # Compute policy losses for options
-        _, option_logits = self.select_option(b_states, b_meta_options, options=b_options)
-        option_probs = Categorical(logits=option_logits)
-        option_log_probs = option_probs.log_prob(b_options)
-        option_policy_loss = -(option_log_probs * option_advantages).mean()
-        option_entropy = option_probs.entropy().mean()
-        option_policy_loss -= args.option_ent_coef * option_entropy
+            # Extract mini-batch
+            mb_states = b_states[start_idx:end_idx]
+            mb_actions = b_actions[start_idx:end_idx]
+            mb_options = b_options[start_idx:end_idx]
+            mb_meta_options = b_meta_options[start_idx:end_idx]
+            mb_rewards = b_rewards[start_idx:end_idx]
+            mb_option_values = b_option_values[start_idx:end_idx]
+            mb_meta_option_values = b_meta_option_values[start_idx:end_idx]
+            mb_values = b_values[start_idx:end_idx]
+            mb_dones = b_dones[start_idx:end_idx]
 
-        # Compute action policy losses
-        _, action_logits = self.select_action(b_states, b_options, actions=b_actions)
-        action_probs = Categorical(logits=action_logits)
-        action_log_probs = action_probs.log_prob(b_actions)
-        action_policy_loss = -(action_log_probs * action_advantages).mean()
-        action_entropy = action_probs.entropy().mean()
-        action_policy_loss -= args.action_ent_coef * action_entropy
+            # Use pre-computed Q-values from the buffer
+            q_action_values = mb_values
+            q_option_values = mb_option_values
+            q_meta_values = mb_meta_option_values
 
-        # Compute termination losses
-        termination_probs_meta = self.termination_function_meta(b_states, b_meta_options)
-        termination_loss_meta = -(meta_advantages * (1 - termination_probs_meta)).mean()
+            # Compute returns and advantages using GAE
+            meta_advantages, meta_returns = self.compute_advantages(
+                mb_rewards, q_meta_values, mb_dones, args.gamma, args.gae_lambda
+            )
+            option_advantages, option_returns = self.compute_advantages(
+                mb_rewards, q_option_values, mb_dones, args.gamma, args.gae_lambda
+            )
+            action_advantages, action_returns = self.compute_advantages(
+                mb_rewards, q_action_values, mb_dones, args.gamma, args.gae_lambda
+            )
 
-        termination_probs_option = self.termination_function_option(b_states, b_options)
-        termination_loss_option = -(option_advantages * (1 - termination_probs_option)).mean()
+            # Compute policy losses for meta-options
+            _, meta_option_logits = self.select_meta_option(mb_states, meta_options=mb_meta_options)
+            meta_option_probs = Categorical(logits=meta_option_logits)
+            meta_log_probs = meta_option_probs.log_prob(mb_meta_options) 
+            meta_policy_loss = -(meta_log_probs * meta_advantages).mean()
+            meta_entropy = meta_option_probs.entropy().mean()
+            meta_policy_loss -= args.meta_ent_coef * meta_entropy
 
-        # Compute critic losses
-        critic_loss_meta = 0.5 * ((q_meta_values - meta_returns) ** 2).mean()
-        critic_loss_option = 0.5 * ((q_option_values - option_returns) ** 2).mean()
-        critic_loss_action = 0.5 * ((q_action_values - action_returns) ** 2).mean()
+            # Compute policy losses for options
+            _, option_logits = self.select_option(mb_states, mb_meta_options, options=mb_options)
+            option_probs = Categorical(logits=option_logits)
+            option_log_probs = option_probs.log_prob(mb_options)
+            option_policy_loss = -(option_log_probs * option_advantages).mean()
+            option_entropy = option_probs.entropy().mean()
+            option_policy_loss -= args.option_ent_coef * option_entropy
 
-        # Total loss
-        total_loss = meta_policy_loss + option_policy_loss + action_policy_loss + \
-                    termination_loss_meta + termination_loss_option + \
-                    critic_loss_meta + critic_loss_option + critic_loss_action
+            # Compute action policy losses
+            _, action_logits = self.select_action(mb_states, mb_options, actions=mb_actions)
+            action_probs = Categorical(logits=action_logits)
+            action_log_probs = action_probs.log_prob(mb_actions)
+            action_policy_loss = -(action_log_probs * action_advantages).mean()
+            action_entropy = action_probs.entropy().mean()
+            action_policy_loss -= args.action_ent_coef * action_entropy
+
+            # Compute termination losses
+            termination_probs_meta = self.termination_function_meta(mb_states, mb_meta_options)
+            termination_loss_meta = -(meta_advantages * (1 - termination_probs_meta)).mean()
+
+            termination_probs_option = self.termination_function_option(mb_states, mb_options)
+            termination_loss_option = -(option_advantages * (1 - termination_probs_option)).mean()
+
+            # Compute critic losses
+            critic_loss_meta = 0.5 * ((q_meta_values - meta_returns) ** 2).mean()
+            critic_loss_option = 0.5 * ((q_option_values - option_returns) ** 2).mean()
+            critic_loss_action = 0.5 * ((q_action_values - action_returns) ** 2).mean()
+
+            # Total loss for the mini-batch
+            mini_batch_loss = meta_policy_loss + option_policy_loss + action_policy_loss + \
+                              termination_loss_meta + termination_loss_option + \
+                              critic_loss_meta + critic_loss_option + critic_loss_action
+
+            # Accumulate total loss
+            total_loss += mini_batch_loss.item()
+
+            # Backward pass for the mini-batch
+            self.optimizer.zero_grad()
+            mini_batch_loss.backward()
+            torch.nn.utils.clip_grad_norm_(self.all_params, args.max_grad_norm)
+            self.optimizer.step()
+
+        # Average total loss over all mini-batches
+        total_loss /= num_batches
 
         # Logging
         writer.add_scalar("losses/total_loss", total_loss, global_step_truth)
@@ -447,12 +474,6 @@ class HOCAgent(nn.Module):
         writer.add_scalar("losses/critic_loss_meta", critic_loss_meta, global_step_truth)
         writer.add_scalar("losses/critic_loss_option", critic_loss_option, global_step_truth)
         writer.add_scalar("losses/critic_loss_action", critic_loss_action, global_step_truth)
-
-        # Backward pass
-        self.optimizer.zero_grad()
-        total_loss.backward()
-        torch.nn.utils.clip_grad_norm_(self.all_params, args.max_grad_norm)
-        self.optimizer.step()
 
         return total_loss
 
