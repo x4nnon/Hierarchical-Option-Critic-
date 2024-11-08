@@ -1,0 +1,26 @@
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:174: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed a `seed` instead of using `Env.seed` for resetting the environment random number generator.
+  logger.warn(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:187: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed `options` to allow the environment initialisation to be passed additional information.
+  logger.warn(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:195: UserWarning: [33mWARN: The result returned by `env.reset()` was not a tuple of the form `(obs, info)`, where `obs` is a observation and `info` is a dictionary containing additional information. Actual type: `<class 'numpy.ndarray'>`
+  logger.warn(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:219: DeprecationWarning: [33mWARN: Core environment is written in old step API which returns one bool instead of two. It is recommended to rewrite the environment with new step API. 
+  logger.deprecation(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:225: DeprecationWarning: `np.bool8` is a deprecated alias for `np.bool_`.  (Deprecated NumPy 1.24)
+  if not isinstance(done, (bool, np.bool8)):
+Traceback (most recent call last):
+  File "/home/x4nno_desktop/Documents/HOC/methods/HOC.py", line 360, in <module>
+    main_training_loop(agent, args, writer, envs, device)
+  File "/home/x4nno_desktop/Documents/HOC/methods/HOC.py", line 316, in main_training_loop
+    meta_option_termination_probs = agent.termination_function_meta(next_obs, current_meta_options)
+  File "/home/x4nno_desktop/Documents/HOC/OC_agents/HOC_agent.py", line 321, in termination_function_meta
+    termination_probs[mask] = termination_prob
+RuntimeError: shape mismatch: value tensor of shape [4, 1] cannot be broadcast to indexing result of shape [4]
+Traceback (most recent call last):
+  File "/home/x4nno_desktop/Documents/HOC/methods/HOC.py", line 360, in <module>
+    main_training_loop(agent, args, writer, envs, device)
+  File "/home/x4nno_desktop/Documents/HOC/methods/HOC.py", line 316, in main_training_loop
+    meta_option_termination_probs = agent.termination_function_meta(next_obs, current_meta_options)
+  File "/home/x4nno_desktop/Documents/HOC/OC_agents/HOC_agent.py", line 321, in termination_function_meta
+    termination_probs[mask] = termination_prob
+RuntimeError: shape mismatch: value tensor of shape [4, 1] cannot be broadcast to indexing result of shape [4]

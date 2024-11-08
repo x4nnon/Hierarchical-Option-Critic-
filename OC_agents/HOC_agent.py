@@ -98,20 +98,56 @@ class ProcGenMetaCritic(nn.Module):
         q_meta_options = self.fc_meta_options(x)  # Shape: (batch_size, num_meta_options)
         return q_meta_options  # Return Q-values for meta-options
     
+class ResidualBlock(nn.Module):
+    def __init__(self, channels):
+        super().__init__()
+        self.conv0 = nn.Conv2d(in_channels=channels, out_channels=channels, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(in_channels=channels, out_channels=channels, kernel_size=3, padding=1)
 
-class SharedStateRepresentation(nn.Module):
-    def __init__(self, input_channels):
-        super(SharedStateRepresentation, self).__init__()
-        self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=3, stride=2)
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=2)
-        self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=2)
+    def forward(self, x):
+        inputs = x
+        x = nn.functional.relu(x)
+        x = self.conv0(x)
+        x = nn.functional.relu(x)
+        x = self.conv1(x)
+        return x + inputs
 
-    def forward(self, state):
-        x = F.relu(self.conv1(state))
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
-        x = x.reshape(x.size(0), -1)
+class ConvSequence(nn.Module):
+    def __init__(self, input_shape, out_channels):
+        super().__init__()
+        self._input_shape = input_shape
+        self._out_channels = out_channels
+        self.conv = nn.Conv2d(in_channels=self._input_shape[0], out_channels=self._out_channels, kernel_size=3, padding=1)
+        self.res_block0 = ResidualBlock(self._out_channels)
+        self.res_block1 = ResidualBlock(self._out_channels)
+
+    def forward(self, x):
+        x = self.conv(x)
+        x = nn.functional.max_pool2d(x, kernel_size=3, stride=2, padding=1)
+        x = self.res_block0(x)
+        x = self.res_block1(x)
+        assert x.shape[1:] == self.get_output_shape()
         return x
+
+    def get_output_shape(self):
+        _c, h, w = self._input_shape
+        return (self._out_channels, (h + 1) // 2, (w + 1) // 2)
+
+# class SharedStateRepresentation(nn.Module):
+#     def __init__(self, input_shape, out_channels):
+#         super(SharedStateRepresentation, self).__init__()
+#         self._input_shape = input_shape
+#         self._out_channels = out_channels
+#         self.conv = nn.Conv2d(in_channels=self._input_shape[0], out_channels=self._out_channels, kernel_size=3, padding=1)
+#         self.res_block0 = ResidualBlock(self._out_channels)
+#         self.res_block1 = ResidualBlock(self._out_channels)
+
+#     def forward(self, state):
+#         x = F.relu(self.conv1(state))
+#         x = F.relu(self.conv2(x))
+#         x = F.relu(self.conv3(x))
+#         x = x.reshape(x.size(0), -1)
+#         return x
     
 class OptionTermination(nn.Module):
     def __init__(self, hidden_dim):
@@ -134,10 +170,14 @@ class MetaTermination(nn.Module):
         x = F.relu(self.fc1(state_rep))
         termination_prob = torch.sigmoid(self.T(x))
         return termination_prob.squeeze(-1)
-    
+
+def layer_init(layer, std=np.sqrt(2), bias_const=0.0):
+    torch.nn.init.orthogonal_(layer.weight, std)
+    torch.nn.init.constant_(layer.bias, bias_const)
+    return layer 
 
 class HOCAgent(nn.Module):
-    def __init__(self, input_channels, num_meta_options, num_options, num_actions, hidden_dim, gamma=0.99, learning_rate=0.001):
+    def __init__(self, envs, num_meta_options, num_options, num_actions, hidden_dim, gamma=0.99, learning_rate=0.001):
         super().__init__()
         self.num_meta_options = num_meta_options
         self.num_options = num_options
@@ -145,23 +185,37 @@ class HOCAgent(nn.Module):
         self.gamma = gamma
 
         # Meta-option policy
-        self.meta_option_policy = ProcGenMetaActor(num_meta_options, hidden_dim).to(device) 
-        # Policy over options
-        self.policys_over_options = [ProcGenOptionActor(num_options, hidden_dim).to(device) for _ in range(num_meta_options)]
+        self.meta_option_policy = layer_init(nn.Linear(256, num_meta_options), std=0.01).to(device) 
+        # Policy over options 
+        self.policys_over_options = [layer_init(nn.Linear(256, num_options), std=0.01).to(device) for _ in range(num_meta_options)]
         # Intra-option policy
-        self.actors_policy = [ProcGenActor(num_actions, hidden_dim).to(device) for _ in range(num_options)]
+        self.actors_policy = [layer_init(nn.Linear(256, num_actions), std=0.01).to(device) for _ in range(num_options)]
         # Critic for option-value estimation
-        self.option_critic = ProcGenOptionCritic(num_options, hidden_dim).to(device)
+        self.option_critic = layer_init(nn.Linear(256, num_options), std=0.1).to(device)
         # Critic for meta-option-value estimation
-        self.meta_critic = ProcGenMetaCritic(num_meta_options, hidden_dim).to(device)
+        self.meta_critic = layer_init(nn.Linear(256, num_meta_options), std=0.1).to(device)
         #critic over actions
-        self.critic_over_actions = ProcGenCritic(num_actions, hidden_dim).to(device)
+        self.critic_over_actions = layer_init(nn.Linear(256, num_actions), std=0.1).to(device)
         #shared state representation
-        self.forward_state_rep = SharedStateRepresentation(input_channels).to(device)
+
+        h, w, c = envs.single_observation_space.shape
+        shape = (c, h, w)
+        conv_seqs = []
+        for out_channels in [16, 32, 32]:
+            conv_seq = ConvSequence(shape, out_channels)
+            shape = conv_seq.get_output_shape()
+            conv_seqs.append(conv_seq)
+        conv_seqs += [
+            nn.Flatten(),
+            nn.ReLU(),
+            nn.Linear(in_features=shape[0] * shape[1] * shape[2], out_features=256),
+            nn.ReLU(),
+        ]
+        self.forward_state_rep = nn.Sequential(*conv_seqs)
 
         # Termination networks for options and meta-options
-        self.option_termination = [OptionTermination(hidden_dim).to(device) for _ in range(num_options)]
-        self.meta_termination = [MetaTermination(hidden_dim).to(device) for _ in range(num_meta_options)]
+        self.option_termination = [layer_init(nn.Linear(256, 1), std=1).to(device) for _ in range(num_options)]
+        self.meta_termination = [layer_init(nn.Linear(256, 1), std=1).to(device) for _ in range(num_meta_options)]
 
         # I think ... check this in the debugger.
         all_policy_over_options_params = [list(self.policys_over_options[i].parameters()) for i in range(num_meta_options)]
@@ -263,6 +317,7 @@ class HOCAgent(nn.Module):
             mask = (meta_option == i)
             if mask.sum() > 0:
                 termination_prob = self.meta_termination[i](state_rep[mask])
+                termination_prob = torch.sigmoid(termination_prob)
                 termination_probs[mask] = termination_prob
         return termination_probs
 
@@ -278,7 +333,8 @@ class HOCAgent(nn.Module):
             mask = (option == i)
             if mask.sum() > 0:
                 termination_prob = self.option_termination[i](state_rep[mask])
-                termination_probs[mask] = termination_prob
+                termination_prob = torch.sigmoid(termination_prob)
+                termination_probs[mask] = termination_prob.squeeze()
         return termination_probs
 
     def compute_q_values(self, state, action, option, meta_option):

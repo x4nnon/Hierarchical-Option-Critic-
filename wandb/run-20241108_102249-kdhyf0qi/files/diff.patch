@@ -1,0 +1,473 @@
+diff --git a/OC_agents/HOC_agent.py b/OC_agents/HOC_agent.py
+index 04ce56d..d293f92 100644
+--- a/OC_agents/HOC_agent.py
++++ b/OC_agents/HOC_agent.py
+@@ -98,20 +98,56 @@ class ProcGenMetaCritic(nn.Module):
+         q_meta_options = self.fc_meta_options(x)  # Shape: (batch_size, num_meta_options)
+         return q_meta_options  # Return Q-values for meta-options
+     
++class ResidualBlock(nn.Module):
++    def __init__(self, channels):
++        super().__init__()
++        self.conv0 = nn.Conv2d(in_channels=channels, out_channels=channels, kernel_size=3, padding=1)
++        self.conv1 = nn.Conv2d(in_channels=channels, out_channels=channels, kernel_size=3, padding=1)
+ 
+-class SharedStateRepresentation(nn.Module):
+-    def __init__(self, input_channels):
+-        super(SharedStateRepresentation, self).__init__()
+-        self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=3, stride=2)
+-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=2)
+-        self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=2)
+-
+-    def forward(self, state):
+-        x = F.relu(self.conv1(state))
+-        x = F.relu(self.conv2(x))
+-        x = F.relu(self.conv3(x))
+-        x = x.reshape(x.size(0), -1)
++    def forward(self, x):
++        inputs = x
++        x = nn.functional.relu(x)
++        x = self.conv0(x)
++        x = nn.functional.relu(x)
++        x = self.conv1(x)
++        return x + inputs
++
++class ConvSequence(nn.Module):
++    def __init__(self, input_shape, out_channels):
++        super().__init__()
++        self._input_shape = input_shape
++        self._out_channels = out_channels
++        self.conv = nn.Conv2d(in_channels=self._input_shape[0], out_channels=self._out_channels, kernel_size=3, padding=1)
++        self.res_block0 = ResidualBlock(self._out_channels)
++        self.res_block1 = ResidualBlock(self._out_channels)
++
++    def forward(self, x):
++        x = self.conv(x)
++        x = nn.functional.max_pool2d(x, kernel_size=3, stride=2, padding=1)
++        x = self.res_block0(x)
++        x = self.res_block1(x)
++        assert x.shape[1:] == self.get_output_shape()
+         return x
++
++    def get_output_shape(self):
++        _c, h, w = self._input_shape
++        return (self._out_channels, (h + 1) // 2, (w + 1) // 2)
++
++# class SharedStateRepresentation(nn.Module):
++#     def __init__(self, input_shape, out_channels):
++#         super(SharedStateRepresentation, self).__init__()
++#         self._input_shape = input_shape
++#         self._out_channels = out_channels
++#         self.conv = nn.Conv2d(in_channels=self._input_shape[0], out_channels=self._out_channels, kernel_size=3, padding=1)
++#         self.res_block0 = ResidualBlock(self._out_channels)
++#         self.res_block1 = ResidualBlock(self._out_channels)
++
++#     def forward(self, state):
++#         x = F.relu(self.conv1(state))
++#         x = F.relu(self.conv2(x))
++#         x = F.relu(self.conv3(x))
++#         x = x.reshape(x.size(0), -1)
++#         return x
+     
+ class OptionTermination(nn.Module):
+     def __init__(self, hidden_dim):
+@@ -134,10 +170,14 @@ class MetaTermination(nn.Module):
+         x = F.relu(self.fc1(state_rep))
+         termination_prob = torch.sigmoid(self.T(x))
+         return termination_prob.squeeze(-1)
+-    
++
++def layer_init(layer, std=np.sqrt(2), bias_const=0.0):
++    torch.nn.init.orthogonal_(layer.weight, std)
++    torch.nn.init.constant_(layer.bias, bias_const)
++    return layer 
+ 
+ class HOCAgent(nn.Module):
+-    def __init__(self, input_channels, num_meta_options, num_options, num_actions, hidden_dim, gamma=0.99, learning_rate=0.001):
++    def __init__(self, envs, num_meta_options, num_options, num_actions, hidden_dim, gamma=0.99, learning_rate=0.001):
+         super().__init__()
+         self.num_meta_options = num_meta_options
+         self.num_options = num_options
+@@ -145,23 +185,37 @@ class HOCAgent(nn.Module):
+         self.gamma = gamma
+ 
+         # Meta-option policy
+-        self.meta_option_policy = ProcGenMetaActor(num_meta_options, hidden_dim).to(device) 
+-        # Policy over options
+-        self.policys_over_options = [ProcGenOptionActor(num_options, hidden_dim).to(device) for _ in range(num_meta_options)]
++        self.meta_option_policy = layer_init(nn.Linear(256, num_meta_options), std=0.01).to(device) 
++        # Policy over options 
++        self.policys_over_options = [layer_init(nn.Linear(256, num_options), std=0.01).to(device) for _ in range(num_meta_options)]
+         # Intra-option policy
+-        self.actors_policy = [ProcGenActor(num_actions, hidden_dim).to(device) for _ in range(num_options)]
++        self.actors_policy = [layer_init(nn.Linear(256, num_actions), std=0.01).to(device) for _ in range(num_options)]
+         # Critic for option-value estimation
+-        self.option_critic = ProcGenOptionCritic(num_options, hidden_dim).to(device)
++        self.option_critic = layer_init(nn.Linear(256, num_options), std=0.1).to(device)
+         # Critic for meta-option-value estimation
+-        self.meta_critic = ProcGenMetaCritic(num_meta_options, hidden_dim).to(device)
++        self.meta_critic = layer_init(nn.Linear(256, num_meta_options), std=0.1).to(device)
+         #critic over actions
+-        self.critic_over_actions = ProcGenCritic(num_actions, hidden_dim).to(device)
++        self.critic_over_actions = layer_init(nn.Linear(256, num_actions), std=0.1).to(device)
+         #shared state representation
+-        self.forward_state_rep = SharedStateRepresentation(input_channels).to(device)
++
++        h, w, c = envs.single_observation_space.shape
++        shape = (c, h, w)
++        conv_seqs = []
++        for out_channels in [16, 32, 32]:
++            conv_seq = ConvSequence(shape, out_channels)
++            shape = conv_seq.get_output_shape()
++            conv_seqs.append(conv_seq)
++        conv_seqs += [
++            nn.Flatten(),
++            nn.ReLU(),
++            nn.Linear(in_features=shape[0] * shape[1] * shape[2], out_features=256),
++            nn.ReLU(),
++        ]
++        self.forward_state_rep = nn.Sequential(*conv_seqs)
+ 
+         # Termination networks for options and meta-options
+-        self.option_termination = [OptionTermination(hidden_dim).to(device) for _ in range(num_options)]
+-        self.meta_termination = [MetaTermination(hidden_dim).to(device) for _ in range(num_meta_options)]
++        self.option_termination = [layer_init(nn.Linear(256, 1), std=1).to(device) for _ in range(num_options)]
++        self.meta_termination = [layer_init(nn.Linear(256, 1), std=1).to(device) for _ in range(num_meta_options)]
+ 
+         # I think ... check this in the debugger.
+         all_policy_over_options_params = [list(self.policys_over_options[i].parameters()) for i in range(num_meta_options)]
+diff --git a/methods/HOC.py b/methods/HOC.py
+index 743b721..b35b5c1 100644
+--- a/methods/HOC.py
++++ b/methods/HOC.py
+@@ -64,8 +64,8 @@ class Args:
+     wandb_entity: str = "tpcannon"
+     capture_video: bool = False
+     env_id: str = "procgen-starpilot"
+-    total_timesteps: int = 1000000
+-    learning_rate: float = 3e-4
++    total_timesteps: int = 20000000
++    learning_rate: float = 5e-4
+     num_envs: int = 8
+     num_steps: int = 256
+     anneal_lr: bool = True
+@@ -75,10 +75,10 @@ class Args:
+     report_epoch: int = 81920
+     anneal_ent: bool = True
+     # entropy coefficients
+-    action_ent_coef: float = 0.005
+-    option_ent_coef: float = 0.005
+-    meta_ent_coef: float = 0.005
+-    max_grad_norm: float = 0.1
++    action_ent_coef: float = 0.015
++    option_ent_coef: float = 0.1
++    meta_ent_coef: float = 0.5
++    max_grad_norm: float = 0.5
+     batch_size: int = 0
+     minibatch_size: int = 0
+     num_iterations: int = 0
+@@ -228,241 +228,6 @@ def compute_returns_and_advantages(rewards, values, dones, next_value, gamma=0.9
+     return returns, advantages
+ 
+ 
+-def oc(args):
+-    args.batch_size = int(args.num_envs * args.num_steps)
+-    args.minibatch_size = int(args.batch_size // args.num_minibatches)
+-    args.num_iterations = args.total_timesteps // args.batch_size
+-    run_name = f"OC_{args.env_id}__{args.exp_name}__{args.seed}__{datetime.now()}"
+-
+-    if args.track and not args.debug:
+-        import wandb
+-        wandb.init(project=args.wandb_project_name, entity=args.wandb_entity, sync_tensorboard=True, config=vars(args), name=run_name, monitor_gym=True, save_code=True)
+-
+-    writer = SummaryWriter(f"runs/{run_name}")
+-    writer.add_text("hyperparameters", "|param|value|\n|-|-|\n%s" % ("\n".join([f"|{key}|{value}|" for key, value in vars(args).items()])))
+-
+-    random.seed(args.seed)
+-    np.random.seed(args.seed)
+-    torch.manual_seed(args.seed)
+-    torch.backends.cudnn.deterministic = args.torch_deterministic
+-
+-    device = torch.device("cuda" if torch.cuda.is_available() and args.cuda else "cpu")
+-
+-    envs = SyncVectorEnv([make_env(args.env_id, i, args.capture_video, run_name, args, sl=args.proc_start, nl=args.proc_num_levels, easy=args.easy) for i in range(args.num_envs)])
+-    assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
+-
+-    # Initialize Option-Critic agent
+-    agent = HOCAgent(
+-        input_channels=3, 
+-        num_actions=envs.single_action_space.n, 
+-        num_options=4,  # Number of options for OC agent
+-        hidden_dim=256,
+-        gamma=args.gamma,
+-        learning_rate=args.learning_rate
+-    ).to(device)
+-    
+-    
+-    ####### load if not in warmup
+-    if not args.warmup:
+-        state_rep_dict = torch.load(f"OC_policies/{args.env_id}/termination.pth")
+-        agent.conv1.load_state_dict(state_rep_dict['conv1'])
+-        agent.conv2.load_state_dict(state_rep_dict['conv2'])
+-        agent.conv3.load_state_dict(state_rep_dict['conv3'])
+-        agent.fc1.load_state_dict(state_rep_dict['fc1'])
+-        agent.termination.load_state_dict(state_rep_dict['termination'])
+-        
+-        agent.intra_option_policy.load_state_dict(torch.load(f"OC_policies/{args.env_id}/intra.pth"))
+-
+-    optimizer = optim.Adam(agent.parameters(), lr=args.learning_rate, eps=1e-5)
+-
+-    obs = torch.zeros((args.num_steps, args.num_envs) + envs.single_observation_space.shape).to(device)
+-    options_buffer = torch.zeros((args.num_steps, args.num_envs), dtype=torch.long).to(device)  # Track active options
+-    actions_buffer = torch.zeros((args.num_steps, args.num_envs), dtype=torch.long).to(device)  # Track primitive actions
+-    values = torch.zeros((args.num_steps, args.num_envs)).to(device)
+-    rewards = torch.zeros((args.num_steps, args.num_envs)).to(device)
+-    dones = torch.zeros((args.num_steps, args.num_envs)).to(device)
+-
+-    global_step_truth = 0
+-    next_obs, _ = envs.reset(seed=args.seed)
+-    next_obs = torch.Tensor(next_obs).to(device)
+-    next_done = torch.zeros(args.num_envs).to(device)
+-
+-    current_options = torch.full((args.num_envs,), -1, dtype=torch.long, device=device)
+-    for iteration in range(1, args.num_iterations + 1):
+-        if args.anneal_lr:
+-            frac = 1.0 - (global_step_truth / args.total_timesteps)
+-            optimizer.param_groups[0]["lr"] = frac * args.learning_rate
+-            
+-        if args.anneal_ent:
+-            frac = 1.0 - (global_step_truth / args.total_timesteps)
+-            ent_action_coef_now = frac * args.ent_coef_action
+-            ent_option_coef_now = frac * args.ent_coef_option
+-        else:
+-            ent_action_coef_now = args.ent_coef_action
+-            ent_option_coef_now = args.ent_coef_option
+-            
+-
+-        for step in range(0, args.num_steps):
+-            obs[step] = next_obs
+-            dones[step] = next_done
+-        
+-            with torch.no_grad():
+-                # For environments where the option has terminated (or no active option), we select a new option
+-                needs_new_option = current_options == -1  # Determine which environments need a new option
+-                
+-                if needs_new_option.any():
+-                    # Select new options for environments where needed
+-                    new_options, _ = agent.select_option(next_obs[needs_new_option])
+-                    current_options[needs_new_option] = new_options  # Update current options
+-        
+-                option_mask = current_options != -1  # Mask for environments where an option is active
+-                current_actions = torch.full((args.num_envs,), -1, dtype=torch.long).to(device)  # Placeholder for actions
+-        
+-                # Select actions using the intra-option policy for all environments (since all have active options now)
+-                intra_option_actions = agent.select_action(next_obs, current_options)
+-                current_actions = intra_option_actions  # Assign the actions for all environments
+-                
+-                _, value = agent.compute_q_value(next_obs, current_options, current_actions)
+-                values[step] = value
+-        
+-            # Compute the Q-value (value) for the current state, for all environments
+-            
+-        
+-            # Store the active options and primitive actions in the buffer for later updates
+-            options_buffer[step] = current_options  # Store the option that was active during this step
+-            actions_buffer[step] = current_actions  # Store the primitive action taken during this step
+-            
+-        
+-            # Step the environment with the selected primitive actions (for all environments in batch)
+-            next_obs, reward, terminations, truncations, infos = envs.step(current_actions.cpu().numpy())  # Actions are now valid for all envs
+-            next_done = np.logical_or(terminations, truncations)
+-            rewards[step] = torch.tensor(reward).to(device).reshape(-1)
+-            
+-            if args.debug:
+-                plot_all_procgen_obs(next_obs, envs, current_options, current_actions)
+-            
+-            if reward.any():
+-                pass # debug point
+-        
+-            next_obs, next_done = torch.Tensor(next_obs).to(device), torch.Tensor(next_done).to(device)
+-            
+-            if "final_info" in infos:
+-                ref=0
+-                for info in infos["final_info"]:
+-                    if info and ("episode" in info):
+-                        print(f"global_step={global_step_truth}, ep_r={info['episode']['r']}, ep_l={info['episode']['l']}")
+-                        writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step_truth)
+-                        writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step_truth)
+-                        # plot_specific_procgen_obs(next_obs, envs, ref)
+-                    ref += 1
+-        
+-            # Option Termination Check
+-            with torch.no_grad():
+-                option_mask = current_options != -1  # Mask for environments where an option is active
+-                if option_mask.any():
+-                    # Only compute termination probabilities for environments where options are active
+-                    termination_probs = agent.termination_function(next_obs[option_mask], current_options[option_mask])
+-                    terminated = torch.bernoulli(termination_probs).bool()  # Sample termination decisions
+-        
+-                    # Set current_options to -1 for environments where the option terminated
+-                    old_current_options = current_options.clone()
+-                    current_options[option_mask] = torch.where(terminated, torch.tensor(-1, device=device, dtype=torch.long), current_options[option_mask])        
+-            global_step_truth += args.num_envs
+-
+-        for epoch in range(args.update_epochs):
+-    
+-            # Compute the next value for the final step
+-            with torch.no_grad():
+-                _, next_value = agent.compute_q_value(next_obs, old_current_options, current_actions)
+-        
+-            # Initialize advantage buffers
+-            option_advantages = torch.zeros_like(rewards).to(device)  # For policy over options
+-            action_advantages = torch.zeros_like(rewards).to(device)  # For intra-option policies
+-        
+-            lastgaelam = 0
+-            for t in reversed(range(args.num_steps)):
+-        
+-                if t == args.num_steps - 1:
+-                    nextnonterminal = 1.0 - next_done
+-                    nextvalues = next_value
+-                else:
+-                    nextnonterminal = 1.0 - dones[t + 1]
+-                    nextvalues = values[t + 1]
+-        
+-                # Delta for GAE (action advantages)
+-                delta = rewards[t] + args.gamma * nextvalues * nextnonterminal - values[t]
+-                action_advantages[t] = lastgaelam = delta + args.gamma * args.gae_lambda * nextnonterminal * lastgaelam
+-        
+-                # Compute option advantages
+-
+-                q_values_for_options = agent.compute_q_values_for_all_options(obs[t])  # Get Q-values for all options at time t
+-                q_value_for_past_option = torch.gather(q_values_for_options, 1, options_buffer[t].reshape(-1, 1)).squeeze(1)
+-    
+-                if obs[t].shape[-1] == 3:
+-                    state = obs[t].permute(0, 3, 1, 2) 
+-    
+-                option_logits = agent.policy_over_options(state / 255)  # Get option logits at time t
+-                option_probs = Categorical(logits=option_logits)  # Softmax to convert logits to probabilities
+-                V_state = torch.sum(option_probs.probs * q_values_for_options, dim=-1)  # V(s), the value function over all options
+-    
+-                # Option advantage: A(s, o) = Q(s, o) - V(s)
+-                option_advantages[t] = q_value_for_past_option - V_state  # Use the value for the active option
+-        
+-            # Compute action returns using the action advantages
+-            returns = action_advantages + values  # Action returns based on action advantages
+-        
+-            # Flatten the batch for updating the policies
+-            b_obs = obs.reshape((-1,) + envs.single_observation_space.shape)
+-            b_actions = actions_buffer.reshape((-1,) + envs.single_action_space.shape)
+-            b_options = options_buffer.reshape((-1,))  # Flattened options
+-            b_action_advantages = action_advantages.reshape(-1)
+-            b_option_advantages = option_advantages.reshape(-1)
+-            b_returns = returns.reshape(-1)
+-            b_values = values.reshape(-1)
+-        
+-            # ------------------- Perform updates -------------------
+-            
+-            _, newvalues = agent.compute_q_value(b_obs, b_options, b_actions)
+-
+-            agent.update_combined_all(b_obs, b_options, b_actions, b_option_advantages,
+-                                      b_action_advantages, newvalues, b_returns, global_step_truth,
+-                                      writer, args, ent_action_coef_now, ent_option_coef_now)
+-            
+-        print("update complete")
+-        
+-        torch.cuda.empty_cache()
+-        if global_step_truth >= args.total_timesteps:
+-            if not args.warmup:
+-                conduct_evals(agent, writer, global_step_truth, run_name, device)
+-                    
+-    
+-    if args.warmup:
+-        
+-        # check make folder
+-        folder_path = f"OC_policies/{args.env_id}"
+-        if not os.path.exists(folder_path):
+-            os.makedirs(folder_path)
+-            print(f"Folder '{folder_path}' created.")
+-        else:
+-            print(f"Folder '{folder_path}' already exists.")
+-        
+-        # save the intra_option
+-        torch.save(agent.intra_option_policy.state_dict(), f"OC_policies/{args.env_id}/intra.pth")
+-        
+-        # save the state_rep and termination:
+-        state_rep_dict = {
+-            'conv1': agent.conv1.state_dict(),
+-            'conv2': agent.conv2.state_dict(),
+-            'conv3': agent.conv3.state_dict(),
+-            'fc1': agent.fc1.state_dict(),
+-            'termination': agent.termination.state_dict(),
+-        }
+-        torch.save(state_rep_dict, f"OC_policies/{args.env_id}/termination.pth")
+-        
+-        
+-    envs.close()
+-    writer.close()
+-
+ 
+ def main_training_loop(agent, args, writer, envs, device):
+     global_step_truth = 0
+@@ -484,6 +249,20 @@ def main_training_loop(agent, args, writer, envs, device):
+     current_meta_options = torch.full((args.num_envs,), -1, dtype=torch.long, device=device)
+ 
+     for iteration in range(1, args.num_iterations + 1):
++        # Anneal learning rate
++        if args.anneal_lr:
++            frac = 1.0 - (iteration - 1.0) / args.num_iterations
++            lr = args.learning_rate * frac
++            for param_group in agent.optimizer.param_groups:
++                param_group['lr'] = lr
++
++        # Anneal entropy coefficients
++        if args.anneal_ent:
++            frac = 1.0 - (iteration - 1.0) / args.num_iterations
++            agent.action_ent_coef = args.action_ent_coef * frac
++            agent.option_ent_coef = args.option_ent_coef * frac
++            agent.meta_ent_coef = args.meta_ent_coef * frac
++
+         for step in range(0, args.num_steps):
+             obs[step] = next_obs
+             dones[step] = next_done
+@@ -569,9 +348,9 @@ if __name__ == "__main__":
+     torch.backends.cudnn.deterministic = args.torch_deterministic
+ 
+     agent = HOCAgent(
+-            input_channels=3,
++            envs=envs,
+             num_meta_options=4,
+-            num_options=16,
++            num_options=4,
+             num_actions=envs.single_action_space.n, 
+             hidden_dim=256,
+             gamma=args.gamma,
+diff --git a/utils/__pycache__/sync_vector_env.cpython-39.pyc b/utils/__pycache__/sync_vector_env.cpython-39.pyc
+index 8c0597e..8e148c4 100644
+Binary files a/utils/__pycache__/sync_vector_env.cpython-39.pyc and b/utils/__pycache__/sync_vector_env.cpython-39.pyc differ
+diff --git a/wandb/debug-internal.log b/wandb/debug-internal.log
+index 6ca9f4e..f9bf28d 120000
+--- a/wandb/debug-internal.log
++++ b/wandb/debug-internal.log
+@@ -1 +1 @@
+-run-20241107_174956-4dr49y5l/logs/debug-internal.log
+\ No newline at end of file
++run-20241108_102249-kdhyf0qi/logs/debug-internal.log
+\ No newline at end of file
+diff --git a/wandb/debug.log b/wandb/debug.log
+index b5ce18a..a866c52 120000
+--- a/wandb/debug.log
++++ b/wandb/debug.log
+@@ -1 +1 @@
+-run-20241107_174956-4dr49y5l/logs/debug.log
+\ No newline at end of file
++run-20241108_102249-kdhyf0qi/logs/debug.log
+\ No newline at end of file
+diff --git a/wandb/latest-run b/wandb/latest-run
+index 8315e40..2d669be 120000
+--- a/wandb/latest-run
++++ b/wandb/latest-run
+@@ -1 +1 @@
+-run-20241107_174956-4dr49y5l
+\ No newline at end of file
++run-20241108_102249-kdhyf0qi
+\ No newline at end of file

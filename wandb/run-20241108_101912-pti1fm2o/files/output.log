@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/x4nno_desktop/Documents/HOC/methods/HOC.py", line 350, in <module>
+    agent = HOCAgent(
+  File "/home/x4nno_desktop/Documents/HOC/OC_agents/HOC_agent.py", line 202, in __init__
+    conv_seq = ConvSequence(shape, out_channels)
+UnboundLocalError: local variable 'shape' referenced before assignment
+Traceback (most recent call last):
+  File "/home/x4nno_desktop/Documents/HOC/methods/HOC.py", line 350, in <module>
+    agent = HOCAgent(
+  File "/home/x4nno_desktop/Documents/HOC/OC_agents/HOC_agent.py", line 202, in __init__
+    conv_seq = ConvSequence(shape, out_channels)
+UnboundLocalError: local variable 'shape' referenced before assignment

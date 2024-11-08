@@ -1,0 +1,30 @@
+diff --git a/utils/__pycache__/sync_vector_env.cpython-39.pyc b/utils/__pycache__/sync_vector_env.cpython-39.pyc
+index 8c0597e..8e148c4 100644
+Binary files a/utils/__pycache__/sync_vector_env.cpython-39.pyc and b/utils/__pycache__/sync_vector_env.cpython-39.pyc differ
+diff --git a/wandb/debug-internal.log b/wandb/debug-internal.log
+index 6ca9f4e..748db86 120000
+--- a/wandb/debug-internal.log
++++ b/wandb/debug-internal.log
+@@ -1 +1 @@
+-run-20241107_174956-4dr49y5l/logs/debug-internal.log
+\ No newline at end of file
++run-20241107_175656-m4vfavon/logs/debug-internal.log
+\ No newline at end of file
+diff --git a/wandb/debug.log b/wandb/debug.log
+index b5ce18a..d796ed6 120000
+--- a/wandb/debug.log
++++ b/wandb/debug.log
+@@ -1 +1 @@
+-run-20241107_174956-4dr49y5l/logs/debug.log
+\ No newline at end of file
++run-20241107_175656-m4vfavon/logs/debug.log
+\ No newline at end of file
+diff --git a/wandb/latest-run b/wandb/latest-run
+index 8315e40..b792681 120000
+--- a/wandb/latest-run
++++ b/wandb/latest-run
+@@ -1 +1 @@
+-run-20241107_174956-4dr49y5l
+\ No newline at end of file
++run-20241107_175656-m4vfavon
+\ No newline at end of file

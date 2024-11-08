@@ -1,0 +1,43 @@
+diff --git a/methods/HOC.py b/methods/HOC.py
+index 743b721..7e53f51 100644
+--- a/methods/HOC.py
++++ b/methods/HOC.py
+@@ -64,7 +64,7 @@ class Args:
+     wandb_entity: str = "tpcannon"
+     capture_video: bool = False
+     env_id: str = "procgen-starpilot"
+-    total_timesteps: int = 1000000
++    total_timesteps: int = 20000000
+     learning_rate: float = 3e-4
+     num_envs: int = 8
+     num_steps: int = 256
+diff --git a/utils/__pycache__/sync_vector_env.cpython-39.pyc b/utils/__pycache__/sync_vector_env.cpython-39.pyc
+index 8c0597e..8e148c4 100644
+Binary files a/utils/__pycache__/sync_vector_env.cpython-39.pyc and b/utils/__pycache__/sync_vector_env.cpython-39.pyc differ
+diff --git a/wandb/debug-internal.log b/wandb/debug-internal.log
+index 6ca9f4e..a628d48 120000
+--- a/wandb/debug-internal.log
++++ b/wandb/debug-internal.log
+@@ -1 +1 @@
+-run-20241107_174956-4dr49y5l/logs/debug-internal.log
+\ No newline at end of file
++run-20241107_180035-3r9c1in6/logs/debug-internal.log
+\ No newline at end of file
+diff --git a/wandb/debug.log b/wandb/debug.log
+index b5ce18a..6ad5a6b 120000
+--- a/wandb/debug.log
++++ b/wandb/debug.log
+@@ -1 +1 @@
+-run-20241107_174956-4dr49y5l/logs/debug.log
+\ No newline at end of file
++run-20241107_180035-3r9c1in6/logs/debug.log
+\ No newline at end of file
+diff --git a/wandb/latest-run b/wandb/latest-run
+index 8315e40..5473403 120000
+--- a/wandb/latest-run
++++ b/wandb/latest-run
+@@ -1 +1 @@
+-run-20241107_174956-4dr49y5l
+\ No newline at end of file
++run-20241107_180035-3r9c1in6
+\ No newline at end of file

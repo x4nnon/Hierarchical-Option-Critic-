@@ -1,0 +1,56 @@
+diff --git a/methods/HOC.py b/methods/HOC.py
+index 743b721..45a4d29 100644
+--- a/methods/HOC.py
++++ b/methods/HOC.py
+@@ -64,7 +64,7 @@ class Args:
+     wandb_entity: str = "tpcannon"
+     capture_video: bool = False
+     env_id: str = "procgen-starpilot"
+-    total_timesteps: int = 1000000
++    total_timesteps: int = 20000000
+     learning_rate: float = 3e-4
+     num_envs: int = 8
+     num_steps: int = 256
+@@ -75,9 +75,9 @@ class Args:
+     report_epoch: int = 81920
+     anneal_ent: bool = True
+     # entropy coefficients
+-    action_ent_coef: float = 0.005
+-    option_ent_coef: float = 0.005
+-    meta_ent_coef: float = 0.005
++    action_ent_coef: float = 0.05
++    option_ent_coef: float = 0.05
++    meta_ent_coef: float = 0.05
+     max_grad_norm: float = 0.1
+     batch_size: int = 0
+     minibatch_size: int = 0
+diff --git a/utils/__pycache__/sync_vector_env.cpython-39.pyc b/utils/__pycache__/sync_vector_env.cpython-39.pyc
+index 8c0597e..8e148c4 100644
+Binary files a/utils/__pycache__/sync_vector_env.cpython-39.pyc and b/utils/__pycache__/sync_vector_env.cpython-39.pyc differ
+diff --git a/wandb/debug-internal.log b/wandb/debug-internal.log
+index 6ca9f4e..c6367f5 120000
+--- a/wandb/debug-internal.log
++++ b/wandb/debug-internal.log
+@@ -1 +1 @@
+-run-20241107_174956-4dr49y5l/logs/debug-internal.log
+\ No newline at end of file
++run-20241107_204253-epaz2ocb/logs/debug-internal.log
+\ No newline at end of file
+diff --git a/wandb/debug.log b/wandb/debug.log
+index b5ce18a..ce87a46 120000
+--- a/wandb/debug.log
++++ b/wandb/debug.log
+@@ -1 +1 @@
+-run-20241107_174956-4dr49y5l/logs/debug.log
+\ No newline at end of file
++run-20241107_204253-epaz2ocb/logs/debug.log
+\ No newline at end of file
+diff --git a/wandb/latest-run b/wandb/latest-run
+index 8315e40..8d3df37 120000
+--- a/wandb/latest-run
++++ b/wandb/latest-run
+@@ -1 +1 @@
+-run-20241107_174956-4dr49y5l
+\ No newline at end of file
++run-20241107_204253-epaz2ocb
+\ No newline at end of file
