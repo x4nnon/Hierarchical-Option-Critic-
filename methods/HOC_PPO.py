@@ -436,6 +436,7 @@ def hoc(args):
         num_options=args.num_options,  # Number of options for OC agent
         num_meta_options=args.num_meta_options,  # Number of meta-options for HOC agent
         hidden_dim=256,
+        envs=envs,
         gamma=args.gamma,
         learning_rate=args.learning_rate
     ).to(device)
