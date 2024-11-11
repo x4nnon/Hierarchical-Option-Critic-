@@ -82,9 +82,9 @@ class Args:
     update_epochs: int = 2
     report_epoch: int = 81920
     anneal_ent: bool = True
-    ent_coef_action: float = 0.01
-    ent_coef_option: float = 0.01
-    ent_coef_meta: float = 0.01
+    ent_coef_action: float = 0.005
+    ent_coef_option: float = 0.005
+    ent_coef_meta: float = 0.005
     clip_coef: float = 0.1
     clip_vloss: bool = False
     vf_coef: float = 0.5

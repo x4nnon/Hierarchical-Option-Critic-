@@ -1,0 +1,205 @@
+wandb_version: 1
+
+NN_cluster_search:
+  desc: null
+  value: true
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.13.11
+    code_path: code/methods/HOC.py
+    framework: huggingface
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.9.18
+    start_time: 1731318990.941784
+    t:
+      1:
+      - 1
+      - 2
+      - 3
+      - 55
+      2:
+      - 1
+      - 2
+      - 3
+      - 11
+      - 49
+      - 55
+      3:
+      - 13
+      - 16
+      - 23
+      - 35
+      4: 3.9.18
+      5: 0.13.11
+      8:
+      - 5
+anneal_ent:
+  desc: null
+  value: true
+anneal_lr:
+  desc: null
+  value: true
+batch_size:
+  desc: null
+  value: 2048
+capture_video:
+  desc: null
+  value: false
+chain_length:
+  desc: null
+  value: 3
+clip_coef:
+  desc: null
+  value: 0.1
+clip_vloss:
+  desc: null
+  value: false
+cuda:
+  desc: null
+  value: true
+current_depth:
+  desc: null
+  value: 100
+debug:
+  desc: null
+  value: 0
+easy:
+  desc: null
+  value: 1
+ent_coef_action:
+  desc: null
+  value: 0.1
+ent_coef_meta:
+  desc: null
+  value: 0.1
+ent_coef_option:
+  desc: null
+  value: 0.1
+env_id:
+  desc: null
+  value: procgen-starpilot
+eval_batch_size:
+  desc: null
+  value: 32
+eval_interval:
+  desc: null
+  value: 100000
+eval_repeats:
+  desc: null
+  value: 1
+eval_specific_envs:
+  desc: null
+  value: 32
+exp_name:
+  desc: null
+  value: HOC
+fix_mdp:
+  desc: null
+  value: false
+gae_lambda:
+  desc: null
+  value: 0.95
+gamma:
+  desc: null
+  value: 0.999
+gen_strength:
+  desc: null
+  value: 0.33
+gen_traj:
+  desc: null
+  value: false
+learning_rate:
+  desc: null
+  value: 0.0005
+max_clusters_per_clusterer:
+  desc: null
+  value: 20
+max_ep_length:
+  desc: null
+  value: 990
+max_eval_ep_len:
+  desc: null
+  value: 1001
+max_grad_norm:
+  desc: null
+  value: 0.1
+minibatch_size:
+  desc: null
+  value: 512
+norm_adv:
+  desc: null
+  value: true
+num_envs:
+  desc: null
+  value: 8
+num_iterations:
+  desc: null
+  value: 4882
+num_meta_options:
+  desc: null
+  value: 8
+num_minibatches:
+  desc: null
+  value: 4
+num_options:
+  desc: null
+  value: 4
+num_steps:
+  desc: null
+  value: 256
+proc_num_levels:
+  desc: null
+  value: 32
+proc_sequential:
+  desc: null
+  value: false
+proc_start:
+  desc: null
+  value: 1
+report_epoch:
+  desc: null
+  value: 40960
+seed:
+  desc: null
+  value: 0
+sep_evals:
+  desc: null
+  value: 0
+specific_proc_list_input:
+  desc: null
+  value: (1,2,5,6,7,9,11,12,15,16)
+start_ood_level:
+  desc: null
+  value: 420
+top_only:
+  desc: null
+  value: false
+torch_deterministic:
+  desc: null
+  value: false
+total_timesteps:
+  desc: null
+  value: 10000000
+track:
+  desc: null
+  value: true
+update_epochs:
+  desc: null
+  value: 2
+use_monochrome:
+  desc: null
+  value: 0
+vf_coef:
+  desc: null
+  value: 0.5
+wandb_entity:
+  desc: null
+  value: tpcannon
+wandb_project_name:
+  desc: null
+  value: HOC_StarPilot_A_QuickTest
+warmup:
+  desc: null
+  value: 1

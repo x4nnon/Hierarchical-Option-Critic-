@@ -1,0 +1,11 @@
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/envs/registration.py:563: UserWarning: [33mWARN: Using the latest versioned environment `procgen-starpilot-v0` instead of the unversioned environment `procgen-starpilot`.
+  logger.warn(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:174: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed a `seed` instead of using `Env.seed` for resetting the environment random number generator.
+  logger.warn(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:187: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed `options` to allow the environment initialisation to be passed additional information.
+  logger.warn(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:195: UserWarning: [33mWARN: The result returned by `env.reset()` was not a tuple of the form `(obs, info)`, where `obs` is a observation and `info` is a dictionary containing additional information. Actual type: `<class 'numpy.ndarray'>`
+  logger.warn(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:219: DeprecationWarning: [33mWARN: Core environment is written in old step API which returns one bool instead of two. It is recommended to rewrite the environment with new step API. 
+  logger.deprecation(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:225: DeprecationWarning: `np.bool8` is a deprecated alias for `np.bool_`.  (Deprecated NumPy 1.24)

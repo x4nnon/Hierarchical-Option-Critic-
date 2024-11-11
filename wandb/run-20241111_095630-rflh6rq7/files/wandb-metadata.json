@@ -1,0 +1,205 @@
+{
+    "os": "Linux-6.6.10-76060610-generic-x86_64-with-glibc2.35",
+    "python": "3.9.18",
+    "heartbeatAt": "2024-11-11T09:56:31.635365",
+    "startedAt": "2024-11-11T09:56:30.933977",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/home/x4nno_desktop/Documents/HOC/methods/HOC.py",
+    "codePath": "methods/HOC.py",
+    "git": {
+        "remote": "https://github.com/x4nnon/Hierarchical-Option-critic-.git",
+        "commit": "0bca8c5c83234000ccf8010086626bda6c7059b4"
+    },
+    "email": "x4nnon@gmail.com",
+    "root": "/home/x4nno_desktop/Documents/HOC",
+    "host": "pop-os",
+    "username": "x4nno_desktop",
+    "executable": "/home/x4nno_desktop/anaconda3/envs/fracos_ppo/bin/python3",
+    "cpu_count": 16,
+    "cpu_count_logical": 32,
+    "cpu_freq": {
+        "current": 3.3713437500000003,
+        "min": 2200.0,
+        "max": 3700.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 3.7,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.7,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 2.2,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.7,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.7,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.7,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.698,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.7,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.702,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.699,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.7,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.702,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.7,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.7,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.702,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 2.2,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.701,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.7,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.697,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.704,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.699,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.699,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.7,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.7,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 2.2,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 2.2,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 2.2,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.701,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.7,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 2.2,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.697,
+            "min": 2200.0,
+            "max": 3700.0
+        },
+        {
+            "current": 3.696,
+            "min": 2200.0,
+            "max": 3700.0
+        }
+    ],
+    "disk": {
+        "total": 459.5024719238281,
+        "used": 274.79381561279297
+    },
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 3060 Ti",
+            "memory_total": 8589934592
+        }
+    ],
+    "memory": {
+        "total": 62.69974899291992
+    }
+}

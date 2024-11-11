@@ -8,7 +8,7 @@ _wandb:
   value:
     cli_version: 0.13.11
     code_path: code/methods/HOC_PPO.py
-    framework: torch
+    framework: huggingface
     is_jupyter_run: false
     is_kaggle_kernel: false
     python_version: 3.9.18
@@ -18,6 +18,13 @@ _wandb:
       - 1
       - 2
       - 3
+      - 55
+      2:
+      - 1
+      - 2
+      - 3
+      - 11
+      - 49
       - 55
       3:
       - 13

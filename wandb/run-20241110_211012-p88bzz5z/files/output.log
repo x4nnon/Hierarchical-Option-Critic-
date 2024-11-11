@@ -1,0 +1,60 @@
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/envs/registration.py:563: UserWarning: [33mWARN: Using the latest versioned environment `procgen-starpilot-v0` instead of the unversioned environment `procgen-starpilot`.
+  logger.warn(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:174: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed a `seed` instead of using `Env.seed` for resetting the environment random number generator.
+  logger.warn(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:187: UserWarning: [33mWARN: Future gym versions will require that `Env.reset` can be passed `options` to allow the environment initialisation to be passed additional information.
+  logger.warn(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:195: UserWarning: [33mWARN: The result returned by `env.reset()` was not a tuple of the form `(obs, info)`, where `obs` is a observation and `info` is a dictionary containing additional information. Actual type: `<class 'numpy.ndarray'>`
+  logger.warn(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:219: DeprecationWarning: [33mWARN: Core environment is written in old step API which returns one bool instead of two. It is recommended to rewrite the environment with new step API. 
+  logger.deprecation(
+/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/gym/utils/passive_env_checker.py:225: DeprecationWarning: `np.bool8` is a deprecated alias for `np.bool_`.  (Deprecated NumPy 1.24)
+  if not isinstance(done, (bool, np.bool8)):
+Traceback (most recent call last):
+  File "/home/x4nno_desktop/Documents/HOC/methods/HOC.py", line 748, in <module>
+    hoc(args)
+  File "/home/x4nno_desktop/Documents/HOC/methods/HOC.py", line 583, in hoc
+    meta_termination_probs = agent.meta_termination_function(temp_state_rep, current_meta_options)
+  File "/home/x4nno_desktop/Documents/HOC/OC_agents/HOC_agent.py", line 368, in meta_termination_function
+    termination_output = self.meta_terminations[meta_option_idx](selected_states)
+  File "/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/x4nno_desktop/Documents/HOC/OC_agents/HOC_agent.py", line 156, in forward
+    x = self.bn(x)
+  File "/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/torch/nn/modules/batchnorm.py", line 175, in forward
+    return F.batch_norm(
+  File "/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/torch/nn/functional.py", line 2480, in batch_norm
+    _verify_batch_size(input.size())
+  File "/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/torch/nn/functional.py", line 2448, in _verify_batch_size
+    raise ValueError(f"Expected more than 1 value per channel when training, got input size {size}")
+ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 1])
+Traceback (most recent call last):
+  File "/home/x4nno_desktop/Documents/HOC/methods/HOC.py", line 748, in <module>
+    hoc(args)
+  File "/home/x4nno_desktop/Documents/HOC/methods/HOC.py", line 583, in hoc
+    meta_termination_probs = agent.meta_termination_function(temp_state_rep, current_meta_options)
+  File "/home/x4nno_desktop/Documents/HOC/OC_agents/HOC_agent.py", line 368, in meta_termination_function
+    termination_output = self.meta_terminations[meta_option_idx](selected_states)
+  File "/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/x4nno_desktop/Documents/HOC/OC_agents/HOC_agent.py", line 156, in forward
+    x = self.bn(x)
+  File "/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/torch/nn/modules/batchnorm.py", line 175, in forward
+    return F.batch_norm(
+  File "/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/torch/nn/functional.py", line 2480, in batch_norm
+    _verify_batch_size(input.size())
+  File "/home/x4nno_desktop/anaconda3/envs/fracos_ppo/lib/python3.9/site-packages/torch/nn/functional.py", line 2448, in _verify_batch_size
+    raise ValueError(f"Expected more than 1 value per channel when training, got input size {size}")
+ValueError: Expected more than 1 value per channel when training, got input size torch.Size([1, 1])

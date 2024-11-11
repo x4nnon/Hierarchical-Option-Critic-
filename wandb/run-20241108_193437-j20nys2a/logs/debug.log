@@ -25,3 +25,4 @@ config: {'exp_name': 'HOC_PPO', 'seed': 0, 'torch_deterministic': False, 'cuda':
 2024-11-08 19:34:42,424 INFO    MainThread:3667575 [wandb_run.py:_redirect():2057] Redirects installed.
 2024-11-08 19:34:42,425 INFO    MainThread:3667575 [wandb_init.py:init():831] run started, returning control to user process
 2024-11-08 19:34:42,425 INFO    MainThread:3667575 [wandb_run.py:_tensorboard_callback():1394] tensorboard callback: runs/HOC_procgen-starpilot__0__2024-11-08 19:34:36.233004, True
+2024-11-09 01:06:20,535 WARNING MsgRouterThr:3667575 [router.py:message_loop():77] message_loop has been closed
